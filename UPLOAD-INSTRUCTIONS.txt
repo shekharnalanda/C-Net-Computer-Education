@@ -1,0 +1,19 @@
+C-NET COMPUTER EDUCATION — BIGROCK UPLOAD
+==========================================
+
+1. BigRock cPanel में File Manager खोलें।
+2. Domain cnetcomputer.mciedu.com का Document Root खोलें।
+   यह अक्सर public_html/cnetcomputer/ या cnetcomputer.mciedu.com/ होता है।
+3. ZIP के अंदर की सभी files Document Root में upload और extract करें।
+   index.html सीधे Document Root में होना चाहिए।
+4. cPanel में Email Account cnet@mciedu.com बनाया हुआ होना चाहिए।
+5. वेबसाइट खोलें और Enquiry Form से एक test enquiry भेजें।
+6. Email न मिले तो Spam/Junk folder देखें और BigRock में PHP mail() enabled है या नहीं पूछें।
+
+IMPORTANT
+---------
+- ZIP folder को nested रूप में upload न करें; index.html root में रहे।
+- PHP version 8.0 या नया रखें।
+- SSL/HTTPS enable करें।
+- Existing files overwrite करने से पहले backup लें।
+
