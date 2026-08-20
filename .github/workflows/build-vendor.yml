@@ -1,0 +1,38 @@
+name: Build Vendor ZIP
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-vendor.yml'
+      - 'composer.json'
+      - 'composer.lock'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-vendor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Install production dependencies
+        run: composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+      - name: Create vendor archive
+        run: zip -qr vendor.zip vendor
+
+      - name: Upload vendor archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: CNet-Laravel-Vendor
+          path: vendor.zip
+          retention-days: 7
+          if-no-files-found: error
