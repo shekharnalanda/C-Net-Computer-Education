@@ -1,4 +1,4 @@
-const courses = [
+const defaultCourses = [
   {code:"DCA",title:"Diploma in Computer Applications",hi:"कंप्यूटर एप्लीकेशन डिप्लोमा",duration:"6 Months",level:"Foundation",summary:"MS Office · Internet · Typing · Digital Services",eligibility:"10th pass or equivalent",modules:["Computer fundamentals & Windows","MS Word document creation","MS Excel spreadsheets","PowerPoint presentations","Internet, email & cyber safety","Hindi/English typing & digital services"],careers:["Computer Operator","Office Assistant","Data Entry Operator"]},
   {code:"ADCA",title:"Advanced Diploma in Computer Applications",hi:"एडवांस कंप्यूटर एप्लीकेशन",duration:"12 Months",level:"Career",summary:"Advanced Office · Tally · DTP · Web Basics",eligibility:"10th/12th pass",modules:["Advanced MS Office","Advanced Excel and MIS","Tally Prime with GST","DTP and graphic design","Web design fundamentals","Projects, typing and viva"],careers:["Office Executive","Accounts Assistant","Computer Faculty"]},
   {code:"CCC",title:"Course on Computer Concepts",hi:"कंप्यूटर कॉन्सेप्ट कोर्स",duration:"3 Months",level:"Foundation",summary:"Digital Literacy · Office Tools · Email · Cyber Safety",eligibility:"Open to all learners",modules:["Computer and OS basics","Word processing","Spreadsheets and presentations","Internet and email","Digital payments and e-governance","Cyber security awareness"],careers:["Digital Service Assistant","Office Support","Entry-level Operator"]},
@@ -12,6 +12,7 @@ const courses = [
   {code:"AI",title:"AI Tools for Study & Work",hi:"पढ़ाई और काम के लिए AI Tools",duration:"1 Month",level:"Future Skill",summary:"Prompting · Research · Productivity · Responsible AI",eligibility:"Basic computer knowledge",modules:["AI fundamentals","Effective prompting","Research and summarisation","Documents and presentations","Creative workflows","Responsible AI"],careers:["AI-enabled Office Assistant","Content Assistant","Productivity Specialist"]},
   {code:"DATA",title:"Data Entry & Office Assistant",hi:"डेटा एंट्री एवं ऑफिस असिस्टेंट",duration:"3 Months",level:"Job-ready",summary:"Typing · Documents · Spreadsheets · Communication",eligibility:"10th pass",modules:["English and Hindi typing","Document formatting","Spreadsheet data entry","Email and file management","Office communication","Accuracy tests"],careers:["Data Entry Operator","Office Assistant","Back Office Executive"]}
 ];
+const courses = Array.isArray(window.CNET_COURSES) && window.CNET_COURSES.length ? window.CNET_COURSES : defaultCourses;
 
 const levels=["All","Foundation","Job-ready","Career","Technical","Creative","Future Skill"];
 const grid=document.getElementById("courseGrid"),filters=document.getElementById("filters"),modal=document.getElementById("courseModal");
