@@ -85,7 +85,14 @@ try {
     cnet_mark('All checks completed');
     $result = '<h2 style="color:green">All Laravel checks passed</h2>';
 } catch (Throwable $exception) {
-    cnet_mark('Throwable captured');
+    $GLOBALS['cnet_step'] = 'Throwable captured';
+    @file_put_contents($stepLog, json_encode(array(
+        'step' => 'Throwable captured',
+        'time' => date('c'),
+        'error' => $exception->getMessage(),
+        'file' => $exception->getFile(),
+        'line' => $exception->getLine(),
+    )));
     $result = '<h2 style="color:#b42318">Laravel exception captured</h2><pre style="white-space:pre-wrap;background:#f3f6f9;padding:16px">'.cnet_safe($exception->getMessage()).'</pre><p>'.cnet_safe($exception->getFile()).':'.(int) $exception->getLine().'</p>';
 }
 
