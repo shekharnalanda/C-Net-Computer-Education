@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Database\Seeders\DatabaseSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
@@ -34,7 +35,11 @@ class AppServiceProvider extends ServiceProvider
         try {
             @set_time_limit(120);
             Artisan::call('migrate', ['--force' => true]);
-            Artisan::call('db:seed', ['--force' => true]);
+
+            $seeder = $this->app->make(DatabaseSeeder::class);
+            $seeder->setContainer($this->app);
+            $seeder->run();
+
             @file_put_contents($marker, now()->toIso8601String());
         } catch (Throwable $exception) {
             Log::error('Automatic deployment setup failed.', [
