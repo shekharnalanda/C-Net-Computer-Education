@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\User;
+use App\Support\GalleryStore;
 use App\Support\SiteSettings;
 use Database\Seeders\DatabaseSeeder;
 use Throwable;
@@ -22,8 +23,9 @@ class HomeController extends Controller
             $courses = Course::where('is_active', true)->orderBy('sort_order')->orderBy('title')->get();
 
             $settings = SiteSettings::all();
+            $gallery = GalleryStore::published();
 
-            return view('home', compact('courses', 'settings'));
+            return view('home', compact('courses', 'settings', 'gallery'));
         } catch (Throwable $exception) {
             return $this->setupErrorResponse($exception->getMessage());
         }

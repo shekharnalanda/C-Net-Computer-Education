@@ -44,3 +44,13 @@ const form=document.getElementById("enquiryForm"),message=document.getElementByI
 form.addEventListener("submit",async e=>{e.preventDefault();const button=form.querySelector("button[type=submit]");button.disabled=true;button.textContent="Sending…";message.className="form-message";try{const response=await fetch(form.action,{method:"POST",body:new FormData(form),headers:{"X-Requested-With":"XMLHttpRequest"}});const data=await response.json();message.textContent=data.message||"Thank you. Your enquiry has been sent.";message.className=`form-message show ${data.success?'success':'error'}`;if(data.success){form.reset();document.getElementById("formToken").value=Date.now().toString();}}catch(err){message.textContent="Enquiry could not be sent. Please call or WhatsApp us.";message.className="form-message show error"}finally{button.disabled=false;button.textContent="Send Enquiry / पूछताछ भेजें ↗"}});
 
 renderFilters();renderCourses();updateJobs();
+
+const galleryBox=document.getElementById("galleryLightbox");
+if(galleryBox){
+  const galleryImage=document.getElementById("galleryLightboxImage"),galleryTitle=document.getElementById("galleryLightboxTitle"),galleryCaption=document.getElementById("galleryLightboxCaption");
+  const closeGallery=()=>{galleryBox.hidden=true;document.body.style.overflow=""};
+  document.querySelectorAll(".gallery-public-item").forEach(item=>item.addEventListener("click",()=>{galleryImage.src=item.dataset.gallerySrc;galleryImage.alt=item.dataset.galleryTitle||"";galleryTitle.textContent=item.dataset.galleryTitle||"";galleryCaption.textContent=item.dataset.galleryCaption||"";galleryBox.hidden=false;document.body.style.overflow="hidden"}));
+  galleryBox.querySelector(".gallery-lightbox-close").addEventListener("click",closeGallery);
+  galleryBox.addEventListener("click",event=>{if(event.target===galleryBox)closeGallery()});
+  document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!galleryBox.hidden)closeGallery()});
+}

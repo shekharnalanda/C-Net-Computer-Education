@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EnquiryController as AdminEnquiryController;
+use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\EnquiryController;
@@ -24,6 +25,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');
         Route::put('/profile',[ProfileController::class,'update'])->name('profile.update');
         Route::put('/profile/password',[ProfileController::class,'updatePassword'])->name('profile.password');
+        Route::get('/gallery',[GalleryController::class,'index'])->name('gallery.index');
+        Route::post('/gallery',[GalleryController::class,'store'])->name('gallery.store');
+        Route::patch('/gallery/{id}/toggle',[GalleryController::class,'toggle'])->name('gallery.toggle');
+        Route::delete('/gallery/{id}',[GalleryController::class,'destroy'])->name('gallery.destroy');
         Route::get('/settings',[SettingsController::class,'edit'])->name('settings.edit');
         Route::put('/settings',[SettingsController::class,'update'])->name('settings.update');
         Route::get('/courses',[CourseController::class,'index'])->name('courses.index');
