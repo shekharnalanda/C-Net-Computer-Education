@@ -25,3 +25,8 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Runtime-managed website content
+/storage/app/cnet-settings.json
+/storage/app/cnet-gallery.json
+/public/uploads/gallery/
