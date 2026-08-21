@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Enquiry;
+use App\Support\SiteSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -27,8 +28,9 @@ class EnquiryController extends Controller
         ]);
 
         try {
-            Mail::raw("Name: {$enquiry->name}\nPhone: {$enquiry->phone}\nEmail: {$enquiry->email}\nCity: {$enquiry->city}\nCourse: {$enquiry->course_code}\nMessage: {$enquiry->message}", function ($mail) use ($enquiry) {
-                $mail->to(config('mail.enquiry_to'))->subject("New C-Net Enquiry: {$enquiry->course_code}");
+            $recipient = SiteSettings::get('email', config('mail.enquiry_to'));
+            Mail::raw("Name: {$enquiry->name}\nPhone: {$enquiry->phone}\nEmail: {$enquiry->email}\nCity: {$enquiry->city}\nCourse: {$enquiry->course_code}\nMessage: {$enquiry->message}", function ($mail) use ($enquiry, $recipient) {
+                $mail->to($recipient)->subject("New C-Net Enquiry: {$enquiry->course_code}");
                 if ($enquiry->email) $mail->replyTo($enquiry->email, $enquiry->name);
             });
         } catch (\Throwable $e) {
