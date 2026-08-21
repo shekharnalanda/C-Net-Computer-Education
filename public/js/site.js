@@ -54,3 +54,10 @@ if(galleryBox){
   galleryBox.addEventListener("click",event=>{if(event.target===galleryBox)closeGallery()});
   document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!galleryBox.hidden)closeGallery()});
 }
+
+const jobBoardSearch=document.getElementById("jobBoardSearch"),jobBoardLocation=document.getElementById("jobBoardLocation");
+if(jobBoardSearch&&jobBoardLocation){
+  const jobCards=[...document.querySelectorAll(".opportunity-card")],jobCount=document.getElementById("jobBoardCount"),jobEmpty=document.getElementById("jobBoardEmpty");
+  const filterJobBoard=()=>{const query=jobBoardSearch.value.trim().toLowerCase(),location=jobBoardLocation.value.trim().toLowerCase();let visible=0;jobCards.forEach(card=>{const show=(!query||card.dataset.jobSearch.includes(query))&&(!location||card.dataset.jobLocation.includes(location));card.hidden=!show;if(show)visible++});jobCount.textContent=visible+" jobs found";jobEmpty.hidden=visible!==0};
+  jobBoardSearch.addEventListener("input",filterJobBoard);jobBoardLocation.addEventListener("input",filterJobBoard);
+}
