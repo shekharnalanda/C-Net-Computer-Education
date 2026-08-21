@@ -52,10 +52,20 @@ try {
     $app = require $root.'/bootstrap/app.php';
     $steps[] = 'Laravel application creation: PASS';
 
-    cnet_mark('Bootstrapping Laravel console kernel');
-    $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-    $kernel->bootstrap();
-    $steps[] = 'Laravel bootstrap: PASS';
+    $bootstrappers = array(
+        'Load environment' => Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
+        'Load configuration' => Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
+        'Handle exceptions' => Illuminate\Foundation\Bootstrap\HandleExceptions::class,
+        'Register facades' => Illuminate\Foundation\Bootstrap\RegisterFacades::class,
+        'Register providers' => Illuminate\Foundation\Bootstrap\RegisterProviders::class,
+        'Boot providers' => Illuminate\Foundation\Bootstrap\BootProviders::class,
+    );
+
+    foreach ($bootstrappers as $label => $bootstrapper) {
+        cnet_mark('Bootstrap stage: '.$label);
+        $app->bootstrapWith(array($bootstrapper));
+        $steps[] = $label.': PASS';
+    }
 
     cnet_mark('Connecting to database');
     Illuminate\Support\Facades\DB::connection()->getPdo();
