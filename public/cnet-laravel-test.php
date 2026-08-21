@@ -1,49 +1,69 @@
 <?php
-declare(strict_types=1);
-
 header('Content-Type: text/html; charset=UTF-8');
-$root = dirname(__DIR__);
-$status = array();
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+ini_set('memory_limit', '256M');
 
-function safe_text($value)
+$GLOBALS['cnet_step'] = 'PHP script started';
+
+function cnet_safe($value)
 {
     $value = preg_replace('/(password|pwd)\s*[=:]\s*[^\s,;]+/i', '$1=[hidden]', (string) $value);
     return htmlspecialchars(substr($value, 0, 1800), ENT_QUOTES, 'UTF-8');
 }
 
+register_shutdown_function(function () {
+    $error = error_get_last();
+    if ($error !== null) {
+        http_response_code(503);
+        echo '<!doctype html><html><body style="font-family:Arial;padding:30px"><h1>PHP fatal error captured</h1>';
+        echo '<p><strong>Last completed step:</strong> '.cnet_safe($GLOBALS['cnet_step']).'</p>';
+        echo '<pre style="white-space:pre-wrap;background:#f3f6f9;padding:16px">'.cnet_safe($error['message']).'</pre>';
+        echo '<p><strong>File:</strong> '.cnet_safe($error['file']).':'.(int) $error['line'].'</p></body></html>';
+    }
+});
+
+$root = dirname(__DIR__);
+$steps = array();
+
 try {
+    $GLOBALS['cnet_step'] = 'Loading Composer autoload';
     require $root.'/vendor/autoload.php';
-    $status[] = 'Composer autoload: PASS';
+    $steps[] = 'Composer autoload: PASS';
 
+    $GLOBALS['cnet_step'] = 'Creating Laravel application';
     $app = require $root.'/bootstrap/app.php';
-    $status[] = 'Laravel application creation: PASS';
+    $steps[] = 'Laravel application creation: PASS';
 
+    $GLOBALS['cnet_step'] = 'Bootstrapping Laravel console kernel';
     $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
     $kernel->bootstrap();
-    $status[] = 'Laravel bootstrap: PASS';
-    $status[] = 'Environment: '.app()->environment();
+    $steps[] = 'Laravel bootstrap: PASS';
 
-    $connection = Illuminate\Support\Facades\DB::connection();
-    $connection->getPdo();
-    $status[] = 'Database connection: PASS';
+    $GLOBALS['cnet_step'] = 'Connecting to database';
+    Illuminate\Support\Facades\DB::connection()->getPdo();
+    $steps[] = 'Database connection: PASS';
 
-    $tables = Illuminate\Support\Facades\DB::select('SHOW TABLES');
-    $status[] = 'Database tables: '.count($tables);
+    $GLOBALS['cnet_step'] = 'Querying users';
+    $steps[] = 'Users: '.App\Models\User::query()->count();
 
-    $status[] = 'Users: '.App\Models\User::query()->count();
-    $status[] = 'Courses: '.App\Models\Course::query()->count();
+    $GLOBALS['cnet_step'] = 'Querying courses';
+    $courses = App\Models\Course::query()->get();
+    $steps[] = 'Courses: '.$courses->count();
 
-    $view = view('home', array('courses' => App\Models\Course::query()->get()))->render();
-    $status[] = 'Home view render: PASS';
+    $GLOBALS['cnet_step'] = 'Rendering home view';
+    view('home', array('courses' => $courses))->render();
+    $steps[] = 'Home view render: PASS';
 
-    $result = '<h2 class="pass">All Laravel checks passed</h2>';
+    $GLOBALS['cnet_step'] = 'All checks completed';
+    $result = '<h2 style="color:green">All Laravel checks passed</h2>';
 } catch (Throwable $exception) {
-    $result = '<h2 class="fail">Laravel check failed</h2><pre>'.safe_text($exception->getMessage()).'</pre><p><strong>Location:</strong> <code>'.safe_text(str_replace($root.'/', '', $exception->getFile())).':'.(int) $exception->getLine().'</code></p>';
+    $GLOBALS['cnet_step'] = 'Throwable captured';
+    $result = '<h2 style="color:#b42318">Laravel exception captured</h2><pre style="white-space:pre-wrap;background:#f3f6f9;padding:16px">'.cnet_safe($exception->getMessage()).'</pre><p>'.cnet_safe($exception->getFile()).':'.(int) $exception->getLine().'</p>';
 }
 
-$steps = '';
-foreach ($status as $line) {
-    $steps .= '<li><code>'.safe_text($line).'</code></li>';
+$list = '';
+foreach ($steps as $step) {
+    $list .= '<li><code>'.cnet_safe($step).'</code></li>';
 }
-
-echo '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>C-Net Laravel Test</title><style>body{margin:0;background:#eef4fb;color:#17324d;font-family:Arial,sans-serif}main{max-width:900px;margin:6vh auto;padding:30px;background:white;border-radius:18px}pre{padding:16px;background:#f3f6f9;border-left:4px solid #f59e0b;white-space:pre-wrap;word-break:break-word}.pass{color:#08783e}.fail{color:#b42318}li{margin:9px}</style></head><body><main><h1>C-Net Laravel test</h1>'.$result.'<h3>Completed steps</h3><ol>'.$steps.'</ol></main></body></html>';
+echo '<!doctype html><html><head><meta charset="utf-8"><title>C-Net Laravel Fatal Test</title></head><body style="font-family:Arial;padding:30px;background:#eef4fb"><main style="max-width:900px;margin:auto;background:white;padding:30px;border-radius:18px"><h1>C-Net Laravel test</h1>'.$result.'<ol>'.$list.'</ol></main></body></html>';
