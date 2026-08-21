@@ -22,6 +22,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/courses',[CourseController::class,'index'])->name('courses.index');
         Route::post('/courses',[CourseController::class,'store'])->name('courses.store');
         Route::put('/courses/{course}',[CourseController::class,'update'])->name('courses.update');
+        Route::patch('/courses/{course}/toggle',[CourseController::class,'toggle'])->name('courses.toggle');
         Route::delete('/courses/{course}',[CourseController::class,'destroy'])->name('courses.destroy');
         Route::get('/enquiries',[AdminEnquiryController::class,'index'])->name('enquiries.index');
         Route::get('/enquiries-export',[AdminEnquiryController::class,'export'])->name('enquiries.export');
