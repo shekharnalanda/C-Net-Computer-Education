@@ -24,6 +24,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('/courses/{course}',[CourseController::class,'update'])->name('courses.update');
         Route::delete('/courses/{course}',[CourseController::class,'destroy'])->name('courses.destroy');
         Route::get('/enquiries',[AdminEnquiryController::class,'index'])->name('enquiries.index');
+        Route::get('/enquiries-export',[AdminEnquiryController::class,'export'])->name('enquiries.export');
         Route::patch('/enquiries/{enquiry}/status',[AdminEnquiryController::class,'updateStatus'])->name('enquiries.status');
         Route::delete('/enquiries/{enquiry}',[AdminEnquiryController::class,'destroy'])->name('enquiries.destroy');
     });
