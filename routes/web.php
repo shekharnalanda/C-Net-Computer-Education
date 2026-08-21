@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EnquiryController as AdminEnquiryController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\NoticeController;
+use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\EnquiryController;
@@ -26,6 +27,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');
         Route::put('/profile',[ProfileController::class,'update'])->name('profile.update');
         Route::put('/profile/password',[ProfileController::class,'updatePassword'])->name('profile.password');
+        Route::get('/jobs',[JobController::class,'index'])->name('jobs.index');
+        Route::post('/jobs',[JobController::class,'store'])->name('jobs.store');
+        Route::patch('/jobs/{id}/toggle',[JobController::class,'toggle'])->name('jobs.toggle');
+        Route::delete('/jobs/{id}',[JobController::class,'destroy'])->name('jobs.destroy');
         Route::get('/notices',[NoticeController::class,'index'])->name('notices.index');
         Route::post('/notices',[NoticeController::class,'store'])->name('notices.store');
         Route::patch('/notices/{id}/toggle',[NoticeController::class,'toggle'])->name('notices.toggle');
