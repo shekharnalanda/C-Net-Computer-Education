@@ -3,17 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\User;
+use Database\Seeders\DatabaseSeeder;
 use Throwable;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        if (app()->bound('cnet.setup_error')) {
-            return $this->setupErrorResponse((string) app('cnet.setup_error'));
-        }
-
         try {
+            if (! Course::query()->exists() || ! User::query()->where('is_admin', true)->exists()) {
+                $seeder = app()->make(DatabaseSeeder::class);
+                $seeder->setContainer(app());
+                $seeder->run();
+            }
+
             $courses = Course::where('is_active', true)->orderBy('sort_order')->orderBy('title')->get();
 
             return view('home', compact('courses'));
@@ -29,7 +33,7 @@ class HomeController extends Controller
             '$1=[hidden]',
             $message
         );
-        $safeMessage = e(mb_substr((string) $safeMessage, 0, 1200));
+        $safeMessage = e(substr((string) $safeMessage, 0, 1200));
         $environment = e(app()->environment());
 
         $html = <<<HTML
@@ -44,16 +48,13 @@ class HomeController extends Controller
         main{max-width:760px;margin:8vh auto;padding:32px;background:#fff;border-radius:18px;box-shadow:0 12px 40px #17324d22}
         h1{color:#075cab} code,pre{background:#f3f6f9;border-radius:8px}
         pre{padding:16px;white-space:pre-wrap;word-break:break-word;border-left:4px solid #f59e0b}
-        li{margin:8px 0}
     </style>
 </head>
 <body><main>
     <h1>C-Net setup needs attention</h1>
-    <p>The application is online, but Laravel could not complete database setup.</p>
+    <p>Laravel is running, but database initialization needs attention.</p>
     <p><strong>Environment:</strong> <code>{$environment}</code></p>
-    <p><strong>Safe diagnostic:</strong></p>
     <pre>{$safeMessage}</pre>
-    <p>Check that <code>APP_ENV=production</code>, the database name/user/password are correct, the database user has all privileges, and <code>ADMIN_PASSWORD</code> is not the placeholder value.</p>
 </main></body></html>
 HTML;
 
