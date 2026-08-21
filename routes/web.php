@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EnquiryController as AdminEnquiryController;
 use App\Http\Controllers\Admin\GalleryController;
+use App\Http\Controllers\Admin\NoticeController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\EnquiryController;
@@ -25,6 +26,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');
         Route::put('/profile',[ProfileController::class,'update'])->name('profile.update');
         Route::put('/profile/password',[ProfileController::class,'updatePassword'])->name('profile.password');
+        Route::get('/notices',[NoticeController::class,'index'])->name('notices.index');
+        Route::post('/notices',[NoticeController::class,'store'])->name('notices.store');
+        Route::patch('/notices/{id}/toggle',[NoticeController::class,'toggle'])->name('notices.toggle');
+        Route::delete('/notices/{id}',[NoticeController::class,'destroy'])->name('notices.destroy');
         Route::get('/gallery',[GalleryController::class,'index'])->name('gallery.index');
         Route::post('/gallery',[GalleryController::class,'store'])->name('gallery.store');
         Route::patch('/gallery/{id}/toggle',[GalleryController::class,'toggle'])->name('gallery.toggle');
