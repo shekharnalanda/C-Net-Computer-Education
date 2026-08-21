@@ -9,17 +9,11 @@ use Throwable;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         if ($this->app->runningInConsole() || ! $this->app->environment('production')) {
@@ -46,6 +40,14 @@ class AppServiceProvider extends ServiceProvider
             Log::error('Automatic deployment setup failed.', [
                 'message' => $exception->getMessage(),
             ]);
+
+            $message = preg_replace(
+                '/(password|pwd)\s*[=:]\s*[^\s,;]+/i',
+                '$1=[hidden]',
+                $exception->getMessage()
+            );
+
+            $this->app->instance('cnet.setup_error', mb_substr((string) $message, 0, 1200));
         }
     }
 }
