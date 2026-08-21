@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', '1');
 ini_set('memory_limit', '256M');
 
-$GLOBALS['cnet_step'] = 'PHP script started';
+cnet_mark('PHP script started');
 
 function cnet_safe($value)
 {
@@ -15,6 +15,13 @@ function cnet_safe($value)
 register_shutdown_function(function () {
     $error = error_get_last();
     if ($error !== null) {
+        @file_put_contents(dirname(__DIR__).'/storage/logs/cnet-bootstrap-step.json', json_encode(array(
+            'step' => isset($GLOBALS['cnet_step']) ? $GLOBALS['cnet_step'] : 'unknown',
+            'time' => date('c'),
+            'error' => $error['message'],
+            'file' => $error['file'],
+            'line' => $error['line'],
+        )));
         http_response_code(503);
         echo '<!doctype html><html><body style="font-family:Arial;padding:30px"><h1>PHP fatal error captured</h1>';
         echo '<p><strong>Last completed step:</strong> '.cnet_safe($GLOBALS['cnet_step']).'</p>';
@@ -24,41 +31,51 @@ register_shutdown_function(function () {
 });
 
 $root = dirname(__DIR__);
+$stepLog = $root.'/storage/logs/cnet-bootstrap-step.json';
+
+function cnet_mark($step)
+{
+    $GLOBALS['cnet_step'] = $step;
+    $payload = array('step' => $step, 'time' => date('c'), 'error' => null);
+    @file_put_contents(dirname(__DIR__).'/storage/logs/cnet-bootstrap-step.json', json_encode($payload));
+}
+
+cnet_mark('PHP script started');
 $steps = array();
 
 try {
-    $GLOBALS['cnet_step'] = 'Loading Composer autoload';
+    cnet_mark('Loading Composer autoload');
     require $root.'/vendor/autoload.php';
     $steps[] = 'Composer autoload: PASS';
 
-    $GLOBALS['cnet_step'] = 'Creating Laravel application';
+    cnet_mark('Creating Laravel application');
     $app = require $root.'/bootstrap/app.php';
     $steps[] = 'Laravel application creation: PASS';
 
-    $GLOBALS['cnet_step'] = 'Bootstrapping Laravel console kernel';
+    cnet_mark('Bootstrapping Laravel console kernel');
     $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
     $kernel->bootstrap();
     $steps[] = 'Laravel bootstrap: PASS';
 
-    $GLOBALS['cnet_step'] = 'Connecting to database';
+    cnet_mark('Connecting to database');
     Illuminate\Support\Facades\DB::connection()->getPdo();
     $steps[] = 'Database connection: PASS';
 
-    $GLOBALS['cnet_step'] = 'Querying users';
+    cnet_mark('Querying users');
     $steps[] = 'Users: '.App\Models\User::query()->count();
 
-    $GLOBALS['cnet_step'] = 'Querying courses';
+    cnet_mark('Querying courses');
     $courses = App\Models\Course::query()->get();
     $steps[] = 'Courses: '.$courses->count();
 
-    $GLOBALS['cnet_step'] = 'Rendering home view';
+    cnet_mark('Rendering home view');
     view('home', array('courses' => $courses))->render();
     $steps[] = 'Home view render: PASS';
 
-    $GLOBALS['cnet_step'] = 'All checks completed';
+    cnet_mark('All checks completed');
     $result = '<h2 style="color:green">All Laravel checks passed</h2>';
 } catch (Throwable $exception) {
-    $GLOBALS['cnet_step'] = 'Throwable captured';
+    cnet_mark('Throwable captured');
     $result = '<h2 style="color:#b42318">Laravel exception captured</h2><pre style="white-space:pre-wrap;background:#f3f6f9;padding:16px">'.cnet_safe($exception->getMessage()).'</pre><p>'.cnet_safe($exception->getFile()).':'.(int) $exception->getLine().'</p>';
 }
 
