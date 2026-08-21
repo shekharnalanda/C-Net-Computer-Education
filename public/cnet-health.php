@@ -74,6 +74,17 @@ try {
 add_item($items, 'Storage writable', is_writable($root.'/storage/framework'), is_writable($root.'/storage/framework') ? 'Yes' : 'No');
 add_item($items, 'Cache writable', is_writable($root.'/bootstrap/cache'), is_writable($root.'/bootstrap/cache') ? 'Yes' : 'No');
 
+$stepLog = $root.'/storage/logs/cnet-bootstrap-step.json';
+if (is_readable($stepLog)) {
+    $stepData = json_decode(file_get_contents($stepLog), true);
+    $detail = isset($stepData['step']) ? $stepData['step'] : 'Unknown';
+    if (!empty($stepData['error'])) $detail .= ' | '.$stepData['error'];
+    if (!empty($stepData['file'])) $detail .= ' | '.$stepData['file'].':'.(int) $stepData['line'];
+    add_item($items, 'Last Laravel test step', empty($stepData['error']) && $detail === 'All checks completed', $detail);
+} else {
+    add_item($items, 'Last Laravel test step', false, 'No test log yet; open cnet-laravel-test.php once, then refresh this page.');
+}
+
 $rows = '';
 foreach ($items as $item) {
     $class = $item[1] ? 'pass' : 'fail';
