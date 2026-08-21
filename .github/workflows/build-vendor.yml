@@ -1,4 +1,4 @@
-name: Build Vendor ZIP
+name: Build and Commit Production Vendor
 
 on:
   push:
@@ -10,29 +10,38 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: production-vendor-build
+  cancel-in-progress: false
 
 jobs:
   build-vendor:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
           coverage: none
 
-      - name: Install production dependencies
-        run: composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+      - name: Build clean production dependencies
+        run: |
+          rm -rf vendor
+          composer install --no-dev --no-scripts --prefer-dist --no-interaction --optimize-autoloader
 
-      - name: Create vendor archive
-        run: zip -qr vendor.zip vendor
-
-      - name: Upload vendor archive
-        uses: actions/upload-artifact@v4
-        with:
-          name: CNet-Laravel-Vendor
-          path: vendor.zip
-          retention-days: 7
-          if-no-files-found: error
+      - name: Commit production vendor to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f vendor
+          if git diff --cached --quiet; then
+            echo "Production vendor is already current."
+          else
+            git commit -m "Build PHP 8.3 production vendor"
+            git push origin HEAD:main
+          fi
