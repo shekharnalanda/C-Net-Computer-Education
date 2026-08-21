@@ -9,4 +9,19 @@
 <section class="section contact" id="contact"><div><span class="kicker light">Visit C-Net</span><h2>Ready to upgrade<br>your digital future?</h2></div><div class="contact-card"><a href="tel:+917004773247"><span>Call</span><b>+91 70047 73247</b></a><a href="mailto:cnetbiharsharif@gmail.com"><span>Email</span><b>cnetbiharsharif@gmail.com</b></a><a href="https://www.google.com/maps/search/?api=1&query=Opp.%20Kalawati%20Palace%2C%20Quamruddin%20Ganj%2C%20Bihar%20Sharif%2C%20Nalanda%2C%20Bihar%20803101" target="_blank"><span>Visit</span><b>Opp. Kalawati Palace<br>Quamruddin Ganj, Bihar Sharif<br>Nalanda – 803101, Bihar</b></a><a class="contact-btn" href="https://wa.me/917004773247" target="_blank">Chat on WhatsApp ↗</a></div></section>
 <footer><div class="footer-brand"><img class="footer-logo" src="{{ asset('images/cnet-logo.webp') }}" alt="C-Net logo"><div><b>C-Net Computer Education</b><p>Skills for today. Confidence for tomorrow.</p></div></div><div class="footer-links"><a href="#courses">Courses</a><a href="#jobs">Job Search</a><a href="#enquiry">Enquiry</a><a href="{{ route('admin.login') }}">Admin</a></div><small>© {{ date('Y') }} C-Net Computer Education.</small></footer>
 </main><div class="course-modal" id="courseModal" role="dialog" aria-modal="true" aria-labelledby="courseTitle" hidden><div class="course-dialog"><button class="modal-close" id="modalClose">×</button><div class="modal-head" id="modalHead"></div><div class="course-facts" id="courseFacts"></div><div class="detail-columns" id="detailColumns"></div><div class="modal-actions"><a href="#enquiry" id="modalEnquire">Enquire for admission ↗</a><button id="modalBack">Back to courses</button></div></div></div>
-<script>window.CNET_COURSES=@json($courses->map(fn($c)=>['code'=>$c->code,'title'=>$c->title,'hi'=>$c->title_hi,'duration'=>$c->duration,'level'=>$c->level,'summary'=>$c->summary,'eligibility'=>$c->eligibility,'modules'=>$c->modules ?: [],'careers'=>$c->careers ?: []]));</script><script src="{{ asset('js/site.js') }}"></script></body></html>
+@php
+$cnetCourses = $courses->map(function ($course) {
+    return [
+        'code' => $course->code,
+        'title' => $course->title,
+        'hi' => $course->title_hi,
+        'duration' => $course->duration,
+        'level' => $course->level,
+        'summary' => $course->summary,
+        'eligibility' => $course->eligibility,
+        'modules' => $course->modules ?: [],
+        'careers' => $course->careers ?: [],
+    ];
+})->values();
+@endphp
+<script>window.CNET_COURSES = @json($cnetCourses);</script><script src="{{ asset('js/site.js') }}"></script></body></html>
