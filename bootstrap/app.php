@@ -92,6 +92,6 @@ HTML;
         });
     })->create();
 
-$application->useEnvironmentFile('.cnet-environment-already-loaded');
+$application->loadEnvironmentFrom('.cnet-environment-already-loaded');
 
 return $application;
