@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Apply online for C-Net Computer Education courses."><title>Online Admission · C-Net Computer Education</title><link rel="stylesheet" href="{{ asset('css/site.css') }}"></head><body class="admission-page">
+<header class="site-header"><a class="brand" href="{{ route('home') }}"><img class="brand-logo" src="{{ asset('images/cnet-logo.webp') }}" alt="C-Net logo"><span><strong>C-Net</strong><small>Computer Education</small></span></a><nav><a href="{{ route('home') }}">Home</a><a href="{{ route('home') }}#courses">Courses</a><a href="{{ route('home') }}#jobs">Jobs</a><a href="{{ route('home') }}#contact">Contact</a></nav><a class="pill" href="{{ route('home') }}">← Back to Website</a></header>
+<main class="admission-main"><section class="admission-intro"><span class="kicker light">Online Admission · ऑनलाइन प्रवेश</span><h1>Start your journey<br><em>with C-Net.</em></h1><p>अपना सही विवरण भरें। आवेदन submit होने के बाद हमारी admission team आपसे संपर्क करेगी।</p><div class="admission-steps"><div><b>01</b><span>Fill application</span></div><div><b>02</b><span>Team verification</span></div><div><b>03</b><span>Admission confirmation</span></div></div><div class="admission-contact"><small>Need help?</small><a href="tel:{{ preg_replace('/\s+/', '', $settings['phone']) }}">{{ $settings['phone'] }}</a><a href="https://wa.me/{{ $settings['whatsapp'] }}" target="_blank">WhatsApp ↗</a></div></section>
+<section class="admission-form-card">@if(session('success'))<div class="application-success"><b>✓ Application received</b><p>Your Application Number is:</p><strong>{{ session('application_no') }}</strong><small>कृपया इस नंबर को सुरक्षित रखें।</small></div>@endif
+@if($errors->any())<div class="form-errors"><b>Please correct these details:</b><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+<div class="application-head"><small>STUDENT APPLICATION FORM</small><h2>Personal & course details</h2><p>Fields marked with * are required.</p></div>
+<form class="online-admission-form" method="post" action="{{ route('admission.store') }}">@csrf
+<label>Student Name / विद्यार्थी का नाम *<input name="student_name" value="{{ old('student_name') }}" required maxlength="100"></label>
+<label>Date of Birth / जन्म तिथि *<input type="date" name="dob" value="{{ old('dob') }}" required></label>
+<label>Gender / लिंग *<select name="gender" required><option value="">Select</option><option @selected(old('gender')==='Male')>Male</option><option @selected(old('gender')==='Female')>Female</option><option @selected(old('gender')==='Other')>Other</option></select></label>
+<label>Parent/Guardian Name *<input name="guardian_name" value="{{ old('guardian_name') }}" required maxlength="100"></label>
+<label>Mobile Number *<input name="phone" value="{{ old('phone') }}" required maxlength="15" pattern="[0-9+ -]{10,15}"></label>
+<label>Email<input type="email" name="email" value="{{ old('email') }}" maxlength="150"></label>
+<label class="full">Full Address / पूरा पता *<textarea name="address" rows="3" required maxlength="300">{{ old('address') }}</textarea></label>
+<label>City / शहर *<input name="city" value="{{ old('city',$settings['city']) }}" required maxlength="100"></label>
+<label>Qualification / योग्यता *<input name="qualification" value="{{ old('qualification') }}" required maxlength="150" placeholder="10th / 12th / Graduate"></label>
+<label>Course Applied For *<select name="course_code" required><option value="">Select course</option>@foreach($courses as $course)<option value="{{ $course->code }}" @selected(old('course_code')===$course->code)>{{ $course->code }} — {{ $course->title }}</option>@endforeach</select></label>
+<label>Preferred Batch Time<input name="preferred_time" value="{{ old('preferred_time') }}" maxlength="100" placeholder="Morning / Afternoon / Evening"></label>
+<label class="full">Message / विशेष जानकारी<textarea name="message" rows="3" maxlength="800">{{ old('message') }}</textarea></label>
+<label class="hp">Leave empty<input name="website" tabindex="-1"></label>
+<label class="full admission-consent"><input type="checkbox" required> I confirm that the information provided is correct.</label>
+<button class="full" type="submit">Submit Admission Application ↗</button>
+</form></section></main>
+<footer><div class="footer-brand"><img class="footer-logo" src="{{ asset('images/cnet-logo.webp') }}" alt="C-Net logo"><div><b>C-Net Computer Education</b><p>Skills for today. Confidence for tomorrow.</p></div></div><div class="footer-links"><a href="{{ route('home') }}">Website</a><a href="{{ route('home') }}#courses">Courses</a><a href="{{ route('home') }}#contact">Contact</a></div><small>© {{ date('Y') }} C-Net Computer Education.</small></footer></body></html>

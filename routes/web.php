@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\AdmissionController as AdminAdmissionController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EnquiryController as AdminEnquiryController;
@@ -9,12 +10,15 @@ use App\Http\Controllers\Admin\NoticeController;
 use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\AdmissionController;
 use App\Http\Controllers\EnquiryController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class,'index'])->name('home');
 Route::post('/enquiry', [EnquiryController::class,'store'])->middleware('throttle:10,1')->name('enquiry.store');
+Route::get('/apply-online', [AdmissionController::class,'create'])->name('admission.create');
+Route::post('/apply-online', [AdmissionController::class,'store'])->middleware('throttle:5,1')->name('admission.store');
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest')->group(function () {
@@ -27,6 +31,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');
         Route::put('/profile',[ProfileController::class,'update'])->name('profile.update');
         Route::put('/profile/password',[ProfileController::class,'updatePassword'])->name('profile.password');
+        Route::get('/admissions',[AdminAdmissionController::class,'index'])->name('admissions.index');
+        Route::get('/admissions-export',[AdminAdmissionController::class,'export'])->name('admissions.export');
+        Route::patch('/admissions/{id}/status',[AdminAdmissionController::class,'updateStatus'])->name('admissions.status');
+        Route::delete('/admissions/{id}',[AdminAdmissionController::class,'destroy'])->name('admissions.destroy');
         Route::get('/jobs',[JobController::class,'index'])->name('jobs.index');
         Route::post('/jobs',[JobController::class,'store'])->name('jobs.store');
         Route::patch('/jobs/{id}/toggle',[JobController::class,'toggle'])->name('jobs.toggle');
