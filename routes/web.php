@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EnquiryController as AdminEnquiryController;
+use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\EnquiryController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +20,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['auth','admin'])->group(function () {
         Route::get('/',[DashboardController::class,'index'])->name('dashboard');
         Route::post('/logout',[AuthController::class,'logout'])->name('logout');
+        Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');
+        Route::put('/profile',[ProfileController::class,'update'])->name('profile.update');
+        Route::put('/profile/password',[ProfileController::class,'updatePassword'])->name('profile.password');
         Route::get('/courses',[CourseController::class,'index'])->name('courses.index');
         Route::post('/courses',[CourseController::class,'store'])->name('courses.store');
         Route::put('/courses/{course}',[CourseController::class,'update'])->name('courses.update');
