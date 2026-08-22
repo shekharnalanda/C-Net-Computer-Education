@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\AttendanceController;
+use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\AssignmentSubmissionController;
 use App\Http\Controllers\Admin\AdmissionController as AdminAdmissionController;
 use App\Http\Controllers\Admin\CourseController;
@@ -56,6 +57,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/certificates',[AdminCertificateController::class,'store'])->name('certificates.store');
         Route::get('/certificates/{id}/print',[AdminCertificateController::class,'print'])->name('certificates.print');
         Route::delete('/certificates/{id}',[AdminCertificateController::class,'destroy'])->name('certificates.destroy');
+        Route::get('/backup',[BackupController::class,'index'])->name('backup.index');
+        Route::get('/backup/download',[BackupController::class,'download'])->name('backup.download');
+        Route::post('/backup/restore',[BackupController::class,'restore'])->name('backup.restore');
         Route::get('/communications',[CommunicationController::class,'index'])->name('communications.index');
         Route::post('/communications',[CommunicationController::class,'store'])->name('communications.store');
         Route::delete('/communications/{id}',[CommunicationController::class,'destroy'])->name('communications.destroy');

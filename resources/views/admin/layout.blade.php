@@ -13,6 +13,7 @@
 <a class="{{ request()->routeIs('admin.practice.*') ? 'active' : '' }}" href="{{ route('admin.practice.index') }}">◉ Practice Tests</a>
 <a class="{{ request()->routeIs('admin.progress.*') ? 'active' : '' }}" href="{{ route('admin.progress.index') }}">↗ Progress Reports</a>
 <a class="{{ request()->routeIs('admin.communications.*') ? 'active' : '' }}" href="{{ route('admin.communications.index') }}">✉ Communications</a>
+<a class="{{ request()->routeIs('admin.backup.*') ? 'active' : '' }}" href="{{ route('admin.backup.index') }}">⤓ Backup & Recovery</a>
 <a class="{{ request()->routeIs('admin.results.*') ? 'active' : '' }}" href="{{ route('admin.results.index') }}">★ Exams & Results</a>
 <a class="{{ request()->routeIs('admin.certificates.*') ? 'active' : '' }}" href="{{ route('admin.certificates.index') }}">◇ Certificates</a>
 <a class="{{ request()->routeIs('admin.enquiries.*') ? 'active' : '' }}" href="{{ route('admin.enquiries.index') }}">✉ Enquiries</a>
