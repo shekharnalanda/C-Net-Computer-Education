@@ -30,7 +30,7 @@ class ProductionAuditTest extends TestCase
         $this->get(route('admin.audit.index'))->assertRedirect(route('admin.login'));
 
         $this->actingAs($admin)->get(route('admin.audit.index'))
-            ->assertOk()->assertSee('Production Audit & Launch Readiness',false)
+            ->assertOk()->assertSee('Production Audit & Launch Readiness')
             ->assertSee('FINAL GO-LIVE GATE');
         $this->actingAs($admin)->get(route('admin.audit.json'))
             ->assertOk()->assertHeader('cache-control','no-store, private')
