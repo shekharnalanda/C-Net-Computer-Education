@@ -148,6 +148,64 @@ class AdmissionController extends Controller
         ]);
     }
 
+
+    public function feeDues(Request $request)
+    {
+        $items = array_values(array_filter(
+            $this->withFinancialDefaults(AdmissionStore::all()),
+            fn (array $item): bool => ($item['status'] ?? '') === 'admitted' && (float) $item['balance_amount'] > 0
+        ));
+        $search = strtolower(trim((string) $request->query('search')));
+        $course = trim((string) $request->query('course'));
+        $paymentStatus = trim((string) $request->query('payment_status'));
+        $age = trim((string) $request->query('age'));
+
+        $items = array_values(array_filter($items, function (array $item) use ($search, $course, $paymentStatus, $age): bool {
+            $haystack = strtolower(($item['application_no'] ?? '').' '.($item['roll_no'] ?? '').' '.($item['student_name'] ?? '').' '.($item['phone'] ?? ''));
+            $start = $item['joining_date'] ?? $item['created_at'] ?? now()->toDateString();
+            $days = max(0, now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($start)->startOfDay()));
+            return (! $search || str_contains($haystack, $search))
+                && (! $course || ($item['course_code'] ?? '') === $course)
+                && (! $paymentStatus || ($item['payment_status'] ?? '') === $paymentStatus)
+                && (! $age || ($age === '30' && $days >= 30) || ($age === '60' && $days >= 60) || ($age === '90' && $days >= 90));
+        }));
+
+        $items = array_map(function (array $item): array {
+            $start = $item['joining_date'] ?? $item['created_at'] ?? now()->toDateString();
+            $item['due_age_days'] = max(0, (int) now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($start)->startOfDay()));
+            $item['last_payment_date'] = collect($item['payments'])->max('payment_date');
+            return $item;
+        }, $items);
+        usort($items, fn (array $a, array $b): int => $b['due_age_days'] <=> $a['due_age_days']);
+
+        return view('admin.fees.dues', [
+            'students' => $items,
+            'totalDue' => collect($items)->sum('balance_amount'),
+            'unpaidCount' => collect($items)->where('payment_status', 'unpaid')->count(),
+            'partialCount' => collect($items)->where('payment_status', 'partial')->count(),
+            'courses' => Course::orderBy('title')->get(['code','title']),
+        ]);
+    }
+
+    public function feeDuesExport(Request $request): StreamedResponse
+    {
+        $response = $this->feeDues($request);
+        $items = $response->getData()['students'];
+
+        return response()->streamDownload(function () use ($items) {
+            $output = fopen('php://output', 'w');
+            fputcsv($output, ['Application No','Roll No','Student','Phone','Course','Total Fee','Paid','Balance','Payment Status','Pending Days','Last Payment']);
+            foreach ($items as $item) {
+                fputcsv($output, [
+                    $item['application_no'] ?? '', $item['roll_no'] ?? '', $item['student_name'] ?? '',
+                    $item['phone'] ?? '', $item['course_code'] ?? '', $item['course_fee'], $item['paid_amount'],
+                    $item['balance_amount'], $item['payment_status'], $item['due_age_days'], $item['last_payment_date'] ?? '',
+                ]);
+            }
+            fclose($output);
+        }, 'cnet-fee-dues-'.date('Y-m-d').'.csv', ['Content-Type' => 'text/csv']);
+    }
+
     public function receipt(string $id)
     {
         $item = AdmissionStore::find($id);
