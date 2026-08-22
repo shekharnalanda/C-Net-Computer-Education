@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Support\AdmissionStore;
 use App\Support\AttendanceStore;
+use App\Support\AssignmentSubmissionStore;
 use App\Support\CertificateStore;
 use App\Support\ExamResultStore;
 use App\Support\LearningResourceStore;
@@ -67,9 +68,35 @@ class StudentPortalController extends Controller
             'attendanceCounts' => $attendanceCounts,
             'attendanceRate' => $attendanceRate,
             'learningResources' => array_values(array_filter(LearningResourceStore::all(), fn (array $row): bool => ($row['is_active'] ?? true) && ($row['course_code'] ?? '') === ($student['course_code'] ?? ''))),
+            'assignmentSubmissions' => collect(AssignmentSubmissionStore::forStudent($student['id']))->keyBy('resource_id'),
             'results' => array_values(array_filter(ExamResultStore::all(), fn (array $row): bool => ($row['student_id'] ?? '') === $student['id'])),
             'certificates' => array_values(array_filter(CertificateStore::all(), fn (array $row): bool => ($row['student_id'] ?? '') === $student['id'])),
         ]);
+    }
+
+    public function submitAssignment(Request $request)
+    {
+        $student = $this->requireStudent($request);
+        $data = $request->validate([
+            'resource_id' => ['required','string'],
+            'answer_text' => ['nullable','string','max:5000','required_without:submission_url'],
+            'submission_url' => ['nullable','url','max:1000','starts_with:http://,https://','required_without:answer_text'],
+        ]);
+        $resource = collect(LearningResourceStore::all())->first(fn (array $row): bool =>
+            ($row['id'] ?? '') === $data['resource_id']
+            && ($row['type'] ?? '') === 'assignment'
+            && ($row['is_active'] ?? true)
+            && ($row['course_code'] ?? '') === ($student['course_code'] ?? '')
+        );
+        abort_unless($resource, 404);
+        AssignmentSubmissionStore::submit([
+            'student_id' => $student['id'],
+            'resource_id' => $resource['id'],
+            'course_code' => $student['course_code'],
+            'answer_text' => trim((string) ($data['answer_text'] ?? '')),
+            'submission_url' => trim((string) ($data['submission_url'] ?? '')),
+        ]);
+        return back()->with('success', 'Assignment submitted successfully.');
     }
 
     public function marksheet(Request $request, string $id)
