@@ -47,7 +47,8 @@ class PracticeTestTest extends TestCase
         $this->actingAs($admin)->patch(route('admin.practice.toggle',$test['id']))->assertRedirect();
         $this->assertFalse(PracticeTestStore::find($test['id'])['is_active']);
         $this->actingAs($admin)->delete(route('admin.practice.destroy',$test['id']))->assertRedirect();
-        $this->assertCount(0,PracticeTestStore::all());
+        $this->assertCount(10,PracticeTestStore::all());
+        $this->assertNull(PracticeTestStore::find($test['id']));
     }
 
     public function test_student_takes_own_course_test_and_gets_instant_score(): void
