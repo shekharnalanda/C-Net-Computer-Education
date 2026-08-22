@@ -71,6 +71,8 @@ class CourseController extends Controller
             'title' => ['required','string','max:160'],
             'title_hi' => ['nullable','string','max:160'],
             'duration' => ['required','string','max:50'],
+            'fee_amount' => ['nullable','numeric','min:0','max:99999999.99'],
+            'fee_note' => ['nullable','string','max:160'],
             'level' => ['required','string','max:50'],
             'summary' => ['required','string','max:500'],
             'eligibility' => ['nullable','string','max:255'],

@@ -34,6 +34,8 @@ $cnetCourses = $courses->map(function ($course) {
         'title' => $course->title,
         'hi' => $course->title_hi,
         'duration' => $course->duration,
+        'fee' => $course->fee_amount !== null ? (float) $course->fee_amount : null,
+        'fee_note' => $course->fee_note,
         'level' => $course->level,
         'summary' => $course->summary,
         'eligibility' => $course->eligibility,

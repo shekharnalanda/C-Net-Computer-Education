@@ -12,6 +12,8 @@
     <form class="form-grid course-form" method="post" action="{{ route('admin.courses.store') }}">@csrf
         <label>Course Code<input name="code" value="{{ old('code') }}" required placeholder="e.g. DCA"></label>
         <label>Duration<input name="duration" value="{{ old('duration') }}" required placeholder="e.g. 6 Months"></label>
+        <label>Course Fee (₹)<input type="number" name="fee_amount" value="{{ old('fee_amount') }}" min="0" step="0.01" placeholder="e.g. 4500"></label>
+        <label>Fee Note<input name="fee_note" value="{{ old('fee_note') }}" maxlength="160" placeholder="e.g. Registration included / Monthly option"></label>
         <label class="full">English Title<input name="title" value="{{ old('title') }}" required></label>
         <label class="full">Hindi Title<input name="title_hi" value="{{ old('title_hi') }}"></label>
         <label>Category<select name="level" required>@foreach(['Foundation','Job-ready','Career','Technical','Creative','Future Skill'] as $level)<option @selected(old('level')===$level)>{{ $level }}</option>@endforeach</select></label>
@@ -43,7 +45,8 @@
         <div><h3>{{ $course->title }}</h3><p>{{ $course->title_hi ?: 'Hindi title not added' }}</p></div>
         <em class="{{ $course->is_active ? 'on' : 'off' }}">{{ $course->is_active ? 'Active' : 'Hidden' }}</em>
     </div>
-    <div class="course-meta"><span>{{ $course->duration }}</span><span>{{ $course->level }}</span><span>Order {{ $course->sort_order }}</span></div>
+    <div class="course-meta"><span>{{ $course->duration }}</span><span>{{ $course->level }}</span><span>{{ $course->fee_amount !== null ? '₹'.number_format((float) $course->fee_amount, 2) : 'Fee not added' }}</span><span>Order {{ $course->sort_order }}</span></div>
+    @if($course->fee_note)<p class="course-fee-note">{{ $course->fee_note }}</p>@endif
     <p class="course-summary-text">{{ $course->summary }}</p>
     <div class="course-card-actions">
         <form method="post" action="{{ route('admin.courses.toggle',$course) }}">@csrf @method('PATCH')<button class="soft-btn">{{ $course->is_active ? 'Hide from Website' : 'Publish on Website' }}</button></form>
@@ -57,6 +60,8 @@
     <form class="form-grid course-form" method="post" action="{{ route('admin.courses.update',$course) }}">@csrf @method('PUT')
         <label>Course Code<input name="code" value="{{ $course->code }}" required></label>
         <label>Duration<input name="duration" value="{{ $course->duration }}" required></label>
+        <label>Course Fee (₹)<input type="number" name="fee_amount" value="{{ $course->fee_amount }}" min="0" step="0.01" placeholder="e.g. 4500"></label>
+        <label>Fee Note<input name="fee_note" value="{{ $course->fee_note }}" maxlength="160" placeholder="Registration, instalment or discount information"></label>
         <label class="full">English Title<input name="title" value="{{ $course->title }}" required></label>
         <label class="full">Hindi Title<input name="title_hi" value="{{ $course->title_hi }}"></label>
         <label>Category<input name="level" value="{{ $course->level }}" required></label>
