@@ -31,7 +31,7 @@
         <details><summary>View full application</summary><p><b>Address:</b> {{ $application['address'] }}</p><p><b>Email:</b> {{ $application['email'] ?: '—' }} · <b>Preferred time:</b> {{ $application['preferred_time'] ?: '—' }}</p>@if($application['message'])<p><b>Message:</b> {{ $application['message'] }}</p>@endif</details>
         <form class="fee-record-form" method="post" action="{{ route('admin.admissions.payment',$application['id']) }}">@csrf @method('PATCH')
             <label>Course Fee ₹<input type="number" name="course_fee" min="0" step="0.01" value="{{ $application['course_fee'] }}" required></label>
-            <label>Paid Amount ₹<input type="number" name="paid_amount" min="0" max="{{ $application['course_fee'] }}" step="0.01" value="{{ $application['paid_amount'] }}" required></label>
+            <label>Paid Amount ₹<input type="number" name="paid_amount" min="0"  step="0.01" value="{{ $application['paid_amount'] }}" required></label>
             <label>Balance ₹<input value="{{ number_format($application['balance_amount'],2) }}" readonly></label>
             <label>Payment Note<input name="payment_note" value="{{ $application['payment_note'] ?? '' }}" maxlength="255" placeholder="Cash / UPI / instalment"></label>
             <button class="soft-btn">Save Fee Record</button>
