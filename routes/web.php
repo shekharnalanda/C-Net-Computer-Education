@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\LearningResourceController;
 use App\Http\Controllers\Admin\PracticeTestController;
 use App\Http\Controllers\Admin\ProgressController;
+use App\Http\Controllers\Admin\ProductionAuditController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ResultController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -57,6 +58,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/certificates',[AdminCertificateController::class,'store'])->name('certificates.store');
         Route::get('/certificates/{id}/print',[AdminCertificateController::class,'print'])->name('certificates.print');
         Route::delete('/certificates/{id}',[AdminCertificateController::class,'destroy'])->name('certificates.destroy');
+        Route::get('/production-audit',[ProductionAuditController::class,'index'])->name('audit.index');
+        Route::get('/production-audit.json',[ProductionAuditController::class,'json'])->name('audit.json');
         Route::get('/backup',[BackupController::class,'index'])->name('backup.index');
         Route::get('/backup/download',[BackupController::class,'download'])->name('backup.download');
         Route::post('/backup/restore',[BackupController::class,'restore'])->name('backup.restore');
@@ -125,4 +128,4 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('/enquiries/{enquiry}',[AdminEnquiryController::class,'destroy'])->name('enquiries.destroy');
     });
 });
-Route::get('/login',fn()=>redirect()->route('admin.login'))->name('login');
+Route::redirect('/login','/admin/login')->name('login');
