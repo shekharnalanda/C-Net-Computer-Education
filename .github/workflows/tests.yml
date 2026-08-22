@@ -30,3 +30,4 @@ jobs:
           SESSION_DRIVER: array
           CACHE_STORE: array
           MAIL_MAILER: array
+          ADMIN_PASSWORD: ci-only-secure-admin-password
