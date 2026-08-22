@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\NoticeController;
 use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\LearningResourceController;
 use App\Http\Controllers\Admin\PracticeTestController;
+use App\Http\Controllers\Admin\ProgressController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ResultController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -54,6 +55,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/certificates',[AdminCertificateController::class,'store'])->name('certificates.store');
         Route::get('/certificates/{id}/print',[AdminCertificateController::class,'print'])->name('certificates.print');
         Route::delete('/certificates/{id}',[AdminCertificateController::class,'destroy'])->name('certificates.destroy');
+        Route::get('/progress',[ProgressController::class,'index'])->name('progress.index');
+        Route::get('/progress/{id}/print',[ProgressController::class,'print'])->name('progress.print');
         Route::get('/practice-tests',[PracticeTestController::class,'index'])->name('practice.index');
         Route::post('/practice-tests',[PracticeTestController::class,'store'])->name('practice.store');
         Route::patch('/practice-tests/{id}/toggle',[PracticeTestController::class,'toggle'])->name('practice.toggle');
