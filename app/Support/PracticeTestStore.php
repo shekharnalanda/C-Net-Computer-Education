@@ -77,6 +77,13 @@ class PracticeTestStore
         array_unshift($items,$attempt); self::write(self::attemptsPath(),$items); return $attempt;
     }
 
+    public static function removeAttemptsForStudents(array $studentIds): int
+    {
+        $items=self::attempts(); $before=count($items);
+        $items=array_values(array_filter($items,fn(array $row):bool=>!in_array($row['student_id']??'',$studentIds,true)));
+        self::write(self::attemptsPath(),$items); return $before-count($items);
+    }
+
     private static function read(string $path): array
     {
         $items=is_readable($path)?json_decode((string)file_get_contents($path),true):[];
