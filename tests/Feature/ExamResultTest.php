@@ -17,12 +17,14 @@ class ExamResultTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Storage::disk('local')->delete(['cnet-admissions.json','cnet-exam-results.json']);
+        @unlink(storage_path('app/cnet-admissions.json'));
+        @unlink(storage_path('app/cnet-exam-results.json'));
     }
 
     protected function tearDown(): void
     {
-        Storage::disk('local')->delete(['cnet-admissions.json','cnet-exam-results.json']);
+        @unlink(storage_path('app/cnet-admissions.json'));
+        @unlink(storage_path('app/cnet-exam-results.json'));
         parent::tearDown();
     }
 
