@@ -42,4 +42,4 @@ $cnetCourses = $courses->map(function ($course) {
     ];
 })->values();
 @endphp
-<script>window.CNET_COURSES = @json($cnetCourses);</script><script src="{{ asset('js/site.js') }}"></script></body></html>
+<script>window.CNET_COURSES = @json($cnetCourses);</script><script src="{{ asset('js/navigation.js') }}"></script><script src="{{ asset('js/site.js') }}"></script></body></html>
