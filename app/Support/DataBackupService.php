@@ -30,7 +30,10 @@ class DataBackupService
             'format'=>'cnet-computer-education-backup','version'=>self::VERSION,
             'created_at'=>now()->toIso8601String(),'application'=>config('app.name'),
             'runtime'=>$runtime,
-            'database'=>['courses'=>Course::all()->toArray(),'enquiries'=>Enquiry::all()->toArray()],
+            'database'=>[
+                'courses'=>Course::all()->map(fn(Course $model):array=>$model->getAttributes())->all(),
+                'enquiries'=>Enquiry::all()->map(fn(Enquiry $model):array=>$model->getAttributes())->all(),
+            ],
         ];
         return ['payload'=>$payload,'signature'=>self::sign($payload)];
     }
