@@ -8,6 +8,7 @@ use App\Support\AttendanceStore;
 use App\Support\CertificateStore;
 use App\Support\ExamResultStore;
 use App\Support\SiteSettings;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -113,7 +114,7 @@ class StudentPortalController extends Controller
         $student = $this->student($request);
         if (! $student) {
             $request->session()->forget('student_portal_id');
-            abort(redirect()->route('student.login'));
+            throw new HttpResponseException(redirect()->route('student.login'));
         }
         return $student;
     }
