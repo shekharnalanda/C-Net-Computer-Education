@@ -13,7 +13,7 @@
 <label>Attendance Date<input type="date" name="date" value="{{ $date }}"></label>
 <label>Batch Name / Timing<input name="batch" value="{{ $batch }}" placeholder="e.g. DCA Morning"></label>
 <button class="btn">Load Students</button><a href="{{ route('admin.attendance.index') }}">Today</a>
-<a class="export-link" href="{{ route('admin.attendance.export',['date'=>$date,'batch'=>$batch]) }}">Export CSV ↓</a>
+<a class="export-link" href="{{ route('admin.attendance.export',['date'=>$date,'batch'=>$batch]) }}">Export CSV ↓</a><a class="export-link" href="{{ route('admin.attendance.report',['month'=>substr($date,0,7),'batch'=>$batch]) }}">Monthly Report →</a>
 </form>
 </section>
 <section class="panel"><div class="panel-title"><div><small>DAILY ATTENDANCE REGISTER</small><h2>{{ \Carbon\Carbon::parse($date)->format('d M Y') }}</h2></div><div class="attendance-bulk"><button type="button" data-mark-all="present">Mark All Present</button><button type="button" data-mark-all="absent">Mark All Absent</button></div></div>
