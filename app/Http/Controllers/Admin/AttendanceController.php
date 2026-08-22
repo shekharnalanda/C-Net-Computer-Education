@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Course;
 use App\Support\AdmissionStore;
 use App\Support\AttendanceStore;
 use Carbon\Carbon;
@@ -67,6 +68,81 @@ class AttendanceController extends Controller
             }
             fclose($output);
         }, 'cnet-attendance-'.$date.'.csv', ['Content-Type' => 'text/csv']);
+    }
+
+    public function monthly(Request $request)
+    {
+        return view('admin.attendance.report', $this->monthlyData($request));
+    }
+
+    public function monthlyExport(Request $request): StreamedResponse
+    {
+        $data = $this->monthlyData($request);
+
+        return response()->streamDownload(function () use ($data) {
+            $output = fopen('php://output', 'w');
+            fputcsv($output, ['Month','Roll No','Student','Application No','Course','Batch','Present','Absent','Leave','Marked Days','Attendance Percentage']);
+            foreach ($data['rows'] as $row) {
+                fputcsv($output, [
+                    $data['month'], $row['student']['roll_no'] ?? '', $row['student']['student_name'] ?? '',
+                    $row['student']['application_no'] ?? '', $row['student']['course_code'] ?? '',
+                    $row['student']['batch_name'] ?? '', $row['present'], $row['absent'], $row['leave'],
+                    $row['marked'], $row['percentage'].'%',
+                ]);
+            }
+            fclose($output);
+        }, 'cnet-monthly-attendance-'.$data['month'].'.csv', ['Content-Type' => 'text/csv']);
+    }
+
+    private function monthlyData(Request $request): array
+    {
+        $month = (string) $request->query('month', now()->format('Y-m'));
+        try {
+            $start = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        } catch (\Throwable) {
+            $start = now()->startOfMonth();
+            $month = $start->format('Y-m');
+        }
+        $end = $start->copy()->endOfMonth();
+        $course = trim((string) $request->query('course'));
+        $batch = strtolower(trim((string) $request->query('batch')));
+        $students = array_values(array_filter(AdmissionStore::all(), function (array $student) use ($course, $batch): bool {
+            $batchText = strtolower(($student['batch_name'] ?? '').' '.($student['batch_time'] ?? ''));
+            return ($student['status'] ?? '') === 'admitted'
+                && (! $course || ($student['course_code'] ?? '') === $course)
+                && (! $batch || str_contains($batchText, $batch));
+        }));
+        $records = array_values(array_filter(AttendanceStore::all(), fn (array $record) => ($record['date'] ?? '') >= $start->toDateString() && ($record['date'] ?? '') <= $end->toDateString()));
+        $byStudent = collect($records)->groupBy('student_id');
+        $rows = array_map(function (array $student) use ($byStudent): array {
+            $records = collect($byStudent->get($student['id'], []));
+            $present = $records->where('status', 'present')->count();
+            $absent = $records->where('status', 'absent')->count();
+            $leave = $records->where('status', 'leave')->count();
+            $marked = $records->count();
+            return [
+                'student' => $student,
+                'present' => $present,
+                'absent' => $absent,
+                'leave' => $leave,
+                'marked' => $marked,
+                'percentage' => $marked > 0 ? round(($present / $marked) * 100, 1) : 0,
+            ];
+        }, $students);
+
+        return [
+            'month' => $month,
+            'monthLabel' => $start->format('F Y'),
+            'course' => $course,
+            'batch' => $request->query('batch', ''),
+            'courses' => Course::orderBy('title')->get(['code','title']),
+            'rows' => $rows,
+            'studentCount' => count($rows),
+            'presentTotal' => collect($rows)->sum('present'),
+            'absentTotal' => collect($rows)->sum('absent'),
+            'leaveTotal' => collect($rows)->sum('leave'),
+            'averagePercentage' => count($rows) ? round(collect($rows)->avg('percentage'), 1) : 0,
+        ];
     }
 
     private function students(string $batch = ''): array
