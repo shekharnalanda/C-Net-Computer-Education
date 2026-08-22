@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\EnquiryController as AdminEnquiryController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\NoticeController;
 use App\Http\Controllers\Admin\JobController;
+use App\Http\Controllers\Admin\LearningResourceController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ResultController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -47,6 +48,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/certificates',[AdminCertificateController::class,'store'])->name('certificates.store');
         Route::get('/certificates/{id}/print',[AdminCertificateController::class,'print'])->name('certificates.print');
         Route::delete('/certificates/{id}',[AdminCertificateController::class,'destroy'])->name('certificates.destroy');
+        Route::get('/learning',[LearningResourceController::class,'index'])->name('learning.index');
+        Route::post('/learning',[LearningResourceController::class,'store'])->name('learning.store');
+        Route::patch('/learning/{id}/toggle',[LearningResourceController::class,'toggle'])->name('learning.toggle');
+        Route::delete('/learning/{id}',[LearningResourceController::class,'destroy'])->name('learning.destroy');
         Route::get('/results',[ResultController::class,'index'])->name('results.index');
         Route::post('/results',[ResultController::class,'store'])->name('results.store');
         Route::get('/results/{id}/marksheet',[ResultController::class,'marksheet'])->name('results.marksheet');
