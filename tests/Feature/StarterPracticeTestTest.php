@@ -52,7 +52,7 @@ class StarterPracticeTestTest extends TestCase
 
         $this->actingAs($admin)->get(route('admin.practice.index'))
             ->assertOk()->assertSee('2 ready-made course test sets installed automatically.')
-            ->assertSee('DCA Computer Fundamentals')->assertSee('Tally Prime & GST',false);
+            ->assertSee('DCA Computer Fundamentals')->assertSee('Tally Prime & GST');
         $this->assertCount(2,PracticeTestStore::all());
 
         $this->actingAs($admin)->get(route('admin.practice.index'))->assertOk()
