@@ -11,6 +11,7 @@
 <a class="{{ request()->routeIs('admin.learning.*') ? 'active' : '' }}" href="{{ route('admin.learning.index') }}">▰ Study Materials</a>
 <a class="{{ request()->routeIs('admin.assignments.*') ? 'active' : '' }}" href="{{ route('admin.assignments.index') }}">✓ Assignment Review</a>
 <a class="{{ request()->routeIs('admin.practice.*') ? 'active' : '' }}" href="{{ route('admin.practice.index') }}">◉ Practice Tests</a>
+<a class="{{ request()->routeIs('admin.progress.*') ? 'active' : '' }}" href="{{ route('admin.progress.index') }}">↗ Progress Reports</a>
 <a class="{{ request()->routeIs('admin.results.*') ? 'active' : '' }}" href="{{ route('admin.results.index') }}">★ Exams & Results</a>
 <a class="{{ request()->routeIs('admin.certificates.*') ? 'active' : '' }}" href="{{ route('admin.certificates.index') }}">◇ Certificates</a>
 <a class="{{ request()->routeIs('admin.enquiries.*') ? 'active' : '' }}" href="{{ route('admin.enquiries.index') }}">✉ Enquiries</a>
