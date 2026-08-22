@@ -18,7 +18,7 @@
 @if(count($students))
 <div class="student-table-wrap"><table class="student-table"><thead><tr><th>Student</th><th>Application / Roll</th><th>Course & Batch</th><th>Contact</th><th>Fee Status</th><th>Balance</th><th>Actions</th></tr></thead><tbody>
 @foreach($students as $student)<tr>
-<td><b>{{ $student['student_name'] }}</b><small>{{ $student['guardian_name'] }} · {{ $student['city'] }}</small><span class="academic-status status-{{ $student['student_status'] ?? 'active' }}">{{ ucfirst($student['student_status'] ?? 'active') }}</span></td>
+<td><b>{{ $student['student_name'] }}</b>@if($student['is_demo']??false)<span class="badge">DEMO</span>@endif<small>{{ $student['guardian_name'] }} · {{ $student['city'] }}</small><span class="academic-status status-{{ $student['student_status'] ?? 'active' }}">{{ ucfirst($student['student_status'] ?? 'active') }}</span></td>
 <td><b>{{ $student['application_no'] }}</b><small>Roll: {{ $student['roll_no'] ?? 'Not assigned' }}</small><small>{{ \Carbon\Carbon::parse($student['joining_date'] ?? $student['created_at'])->format('d M Y') }}</small></td>
 <td><span class="course-tag">{{ $student['course_code'] }}</span><small>{{ $student['batch_name'] ?? 'Batch not assigned' }}</small><small>{{ $student['batch_time'] ?? $student['preferred_time'] ?: 'Timing not set' }}</small></td>
 <td><a href="tel:{{ preg_replace('/\s+/', '', $student['phone']) }}">{{ $student['phone'] }}</a></td>
