@@ -163,7 +163,7 @@ class AdmissionController extends Controller
         $items = array_values(array_filter($items, function (array $item) use ($search, $course, $paymentStatus, $age): bool {
             $haystack = strtolower(($item['application_no'] ?? '').' '.($item['roll_no'] ?? '').' '.($item['student_name'] ?? '').' '.($item['phone'] ?? ''));
             $start = $item['joining_date'] ?? $item['created_at'] ?? now()->toDateString();
-            $days = max(0, now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($start)->startOfDay()));
+            $days = max(0, now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($start)->startOfDay(), true));
             return (! $search || str_contains($haystack, $search))
                 && (! $course || ($item['course_code'] ?? '') === $course)
                 && (! $paymentStatus || ($item['payment_status'] ?? '') === $paymentStatus)
@@ -172,7 +172,7 @@ class AdmissionController extends Controller
 
         $items = array_map(function (array $item): array {
             $start = $item['joining_date'] ?? $item['created_at'] ?? now()->toDateString();
-            $item['due_age_days'] = max(0, (int) now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($start)->startOfDay()));
+            $item['due_age_days'] = max(0, (int) now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($start)->startOfDay(), true));
             $item['last_payment_date'] = collect($item['payments'])->max('payment_date');
             return $item;
         }, $items);
