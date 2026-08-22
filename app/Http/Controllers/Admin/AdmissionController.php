@@ -206,6 +206,35 @@ class AdmissionController extends Controller
         }, 'cnet-fee-dues-'.date('Y-m-d').'.csv', ['Content-Type' => 'text/csv']);
     }
 
+
+    public function feeCollections(Request $request)
+    {
+        $report = $this->filteredPaymentTransactions($request);
+
+        return view('admin.fees.collections', array_merge($report, [
+            'courses' => Course::orderBy('title')->get(['code','title']),
+        ]));
+    }
+
+    public function feeCollectionsExport(Request $request): StreamedResponse
+    {
+        $report = $this->filteredPaymentTransactions($request);
+        $transactions = $report['transactions'];
+
+        return response()->streamDownload(function () use ($transactions) {
+            $output = fopen('php://output', 'w');
+            fputcsv($output, ['Receipt No','Payment Date','Student','Application No','Roll No','Course','Amount','Mode','Reference','Note']);
+            foreach ($transactions as $row) {
+                fputcsv($output, [
+                    $row['receipt_no'], $row['payment_date'], $row['student_name'], $row['application_no'],
+                    $row['roll_no'], $row['course_code'], $row['amount'], strtoupper($row['mode']),
+                    $row['reference'] ?? '', $row['note'] ?? '',
+                ]);
+            }
+            fclose($output);
+        }, 'cnet-fee-collections-'.date('Y-m-d').'.csv', ['Content-Type' => 'text/csv']);
+    }
+
     public function receipt(string $id)
     {
         $item = AdmissionStore::find($id);
@@ -245,6 +274,50 @@ class AdmissionController extends Controller
             }
             fclose($output);
         }, 'cnet-admissions-fees-'.date('Y-m-d').'.csv', ['Content-Type' => 'text/csv']);
+    }
+
+
+    private function filteredPaymentTransactions(Request $request): array
+    {
+        $from = $request->filled('from') ? \Carbon\Carbon::parse($request->query('from'))->startOfDay() : now()->startOfMonth();
+        $to = $request->filled('to') ? \Carbon\Carbon::parse($request->query('to'))->endOfDay() : now()->endOfDay();
+        $course = trim((string) $request->query('course'));
+        $mode = trim((string) $request->query('mode'));
+        $search = strtolower(trim((string) $request->query('search')));
+        $transactions = [];
+
+        foreach ($this->withFinancialDefaults(AdmissionStore::all()) as $application) {
+            foreach ($application['payments'] as $payment) {
+                $date = \Carbon\Carbon::parse($payment['payment_date']);
+                $haystack = strtolower(($application['student_name'] ?? '').' '.($application['application_no'] ?? '').' '.($application['roll_no'] ?? '').' '.($payment['receipt_no'] ?? '').' '.($payment['reference'] ?? ''));
+                if ($date->lt($from) || $date->gt($to)
+                    || ($course && ($application['course_code'] ?? '') !== $course)
+                    || ($mode && ($payment['mode'] ?? '') !== $mode)
+                    || ($search && ! str_contains($haystack, $search))) {
+                    continue;
+                }
+                $transactions[] = array_merge($payment, [
+                    'student_id' => $application['id'],
+                    'student_name' => $application['student_name'] ?? '',
+                    'application_no' => $application['application_no'] ?? '',
+                    'roll_no' => $application['roll_no'] ?? '',
+                    'course_code' => $application['course_code'] ?? '',
+                ]);
+            }
+        }
+        usort($transactions, fn (array $a, array $b): int => strcmp(($b['payment_date'] ?? '').($b['created_at'] ?? ''), ($a['payment_date'] ?? '').($a['created_at'] ?? '')));
+        $collection = collect($transactions);
+
+        return [
+            'transactions' => $transactions,
+            'totalCollected' => (float) $collection->sum('amount'),
+            'transactionCount' => $collection->count(),
+            'cashCollected' => (float) $collection->where('mode', 'cash')->sum('amount'),
+            'digitalCollected' => (float) $collection->whereIn('mode', ['upi','bank','card'])->sum('amount'),
+            'dailyTotals' => $collection->groupBy('payment_date')->map(fn ($rows) => (float) $rows->sum('amount'))->sortKeysDesc(),
+            'from' => $from->toDateString(),
+            'to' => $to->toDateString(),
+        ];
     }
 
     private function withFinancialDefaults(array $items): array
