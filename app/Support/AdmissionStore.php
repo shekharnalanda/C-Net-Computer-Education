@@ -23,10 +23,16 @@ class AdmissionStore
     public static function add(array $data): array
     {
         $items = self::all();
+        $courseFee = (float) ($data['course_fee'] ?? 0);
         $item = array_merge($data, [
             'id' => (string) Str::uuid(),
             'application_no' => 'CNET-'.now()->format('ymd').'-'.strtoupper(Str::random(5)),
             'status' => 'pending',
+            'course_fee' => $courseFee,
+            'paid_amount' => 0,
+            'balance_amount' => $courseFee,
+            'payment_status' => 'unpaid',
+            'receipt_no' => null,
             'created_at' => now()->toIso8601String(),
         ]);
         array_unshift($items, $item);
@@ -37,20 +43,26 @@ class AdmissionStore
 
     public static function updateStatus(string $id, string $status): bool
     {
-        $items = self::all();
-        $changed = false;
-        foreach ($items as &$item) {
-            if (($item['id'] ?? '') === $id) {
-                $item['status'] = $status;
-                $item['updated_at'] = now()->toIso8601String();
-                $changed = true;
-                break;
-            }
-        }
-        unset($item);
-        if ($changed) self::write($items);
+        return self::update($id, function (array $item) use ($status): array {
+            $item['status'] = $status;
+            return $item;
+        });
+    }
 
-        return $changed;
+    public static function updatePayment(string $id, float $courseFee, float $paidAmount, ?string $paymentNote = null): bool
+    {
+        return self::update($id, function (array $item) use ($courseFee, $paidAmount, $paymentNote): array {
+            $balance = max(0, $courseFee - $paidAmount);
+            $item['course_fee'] = $courseFee;
+            $item['paid_amount'] = $paidAmount;
+            $item['balance_amount'] = $balance;
+            $item['payment_status'] = $paidAmount <= 0 ? 'unpaid' : ($balance > 0 ? 'partial' : 'paid');
+            $item['payment_note'] = $paymentNote;
+            if ($paidAmount > 0 && empty($item['receipt_no'])) {
+                $item['receipt_no'] = 'CNET-R'.now()->format('ymd').'-'.strtoupper(Str::random(4));
+            }
+            return $item;
+        });
     }
 
     public static function remove(string $id): bool
@@ -62,6 +74,24 @@ class AdmissionStore
         self::write($items);
 
         return true;
+    }
+
+    private static function update(string $id, callable $callback): bool
+    {
+        $items = self::all();
+        $changed = false;
+        foreach ($items as &$item) {
+            if (($item['id'] ?? '') === $id) {
+                $item = $callback($item);
+                $item['updated_at'] = now()->toIso8601String();
+                $changed = true;
+                break;
+            }
+        }
+        unset($item);
+        if ($changed) self::write($items);
+
+        return $changed;
     }
 
     private static function write(array $items): void
