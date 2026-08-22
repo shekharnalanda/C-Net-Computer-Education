@@ -12,6 +12,7 @@ class PracticeTestStore
     public static function all(): array
     {
         $items = self::read(self::testsPath());
+        $items=array_map([self::class,'withAssessmentMetadata'],$items);
         usort($items, fn(array $a,array $b): int => strcmp($b['created_at'] ?? '', $a['created_at'] ?? ''));
         return $items;
     }
@@ -24,11 +25,11 @@ class PracticeTestStore
 
     public static function installStarterSets(array $courseCodes): int
     {
-        if (count(self::all()) > 0) return 0;
         $allowed=array_flip(array_map('strtoupper',$courseCodes));
+        $installed=array_flip(array_filter(array_column(self::all(),'starter_key')));
         $count=0;
         foreach(StarterPracticeTests::all() as $test){
-            if(isset($allowed[strtoupper($test['course_code'])])){ self::add($test); $count++; }
+            if(isset($allowed[strtoupper($test['course_code'])])&&!isset($installed[$test['starter_key']])){ self::add($test); $count++; }
         }
         return $count;
     }
@@ -85,5 +86,19 @@ class PracticeTestStore
     private static function write(string $path,array $items): void
     {
         file_put_contents($path,json_encode($items,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),LOCK_EX);
+    }
+
+    private static function withAssessmentMetadata(array $test): array
+    {
+        if(isset($test['assessment_order'])) return $test;
+        if(preg_match('/-set-([1-5])$/',(string)($test['starter_key']??''),$match)){
+            $order=(int)$match[1];
+            $types=[1=>'practice',2=>'practice',3=>'terminal',4=>'terminal',5=>'final'];
+            $weights=[1=>10,2=>10,3=>20,4=>20,5=>40];
+            $test['assessment_order']=$order;
+            $test['assessment_type']=$types[$order];
+            $test['assessment_weight']=$weights[$order];
+        }
+        return $test;
     }
 }
