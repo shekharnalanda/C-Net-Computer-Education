@@ -89,7 +89,7 @@ class LearningResourceTest extends TestCase
         ])->assertRedirect(route('student.dashboard'));
 
         $this->get(route('student.dashboard'))->assertOk()
-            ->assertSee('Study Materials &amp; Assignments', false)
+            ->assertSee('Study Materials & Assignments')
             ->assertSee('DCA Computer Fundamentals Notes')
             ->assertSee('https://example.com/dca-notes', false)
             ->assertDontSee('Private Tally Video')
