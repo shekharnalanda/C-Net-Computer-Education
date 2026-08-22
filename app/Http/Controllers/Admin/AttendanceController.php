@@ -98,7 +98,7 @@ class AttendanceController extends Controller
     {
         $month = (string) $request->query('month', now()->format('Y-m'));
         try {
-            $start = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+            $start = Carbon::createFromFormat('Y-m-d', $month.'-01')->startOfMonth();
         } catch (\Throwable) {
             $start = now()->startOfMonth();
             $month = $start->format('Y-m');
