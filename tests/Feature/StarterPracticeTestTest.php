@@ -31,10 +31,16 @@ class StarterPracticeTestTest extends TestCase
     {
         $expected=['DCA','ADCA','CCC','TALLY','EXCEL','DTP','WEB','PYTHON','DIGITAL','HARDWARE','AI','DATA'];
         $sets=StarterPracticeTests::all();
-        $this->assertSame($expected,array_column($sets,'course_code'));
+        $this->assertCount(60,$sets);
+        $this->assertSame($expected,collect($sets)->pluck('course_code')->unique()->values()->all());
+        foreach($expected as $course){
+            $courseSets=collect($sets)->where('course_code',$course)->sortBy('assessment_order')->values();
+            $this->assertCount(5,$courseSets);
+            $this->assertSame(['practice','practice','terminal','terminal','final'],$courseSets->pluck('assessment_type')->all());
+            $this->assertSame([10,10,20,20,40],$courseSets->pluck('assessment_weight')->all());
+        }
         foreach($sets as $set){
             $this->assertCount(5,$set['questions']);
-            $this->assertSame(15,$set['duration_minutes']);
             $this->assertSame(40,$set['pass_percentage']);
             foreach($set['questions'] as $question){
                 $this->assertCount(4,$question['options']);
@@ -51,12 +57,12 @@ class StarterPracticeTestTest extends TestCase
         $admin=User::factory()->create(['is_admin'=>true]);
 
         $this->actingAs($admin)->get(route('admin.practice.index'))
-            ->assertOk()->assertSee('2 ready-made course test sets installed automatically.')
-            ->assertSee('DCA Computer Fundamentals')->assertSee('Tally Prime & GST');
-        $this->assertCount(2,PracticeTestStore::all());
+            ->assertOk()->assertSee('10 ready-made course assessment sets installed automatically.')
+            ->assertSee('DCA Practice Test 1')->assertSee('TALLY Final Test');
+        $this->assertCount(10,PracticeTestStore::all());
 
         $this->actingAs($admin)->get(route('admin.practice.index'))->assertOk()
             ->assertDontSee('installed automatically');
-        $this->assertCount(2,PracticeTestStore::all());
+        $this->assertCount(10,PracticeTestStore::all());
     }
 }

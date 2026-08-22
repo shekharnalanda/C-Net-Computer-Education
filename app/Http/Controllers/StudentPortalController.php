@@ -7,6 +7,7 @@ use App\Support\AdmissionStore;
 use App\Support\AttendanceStore;
 use App\Support\AssignmentSubmissionStore;
 use App\Support\CertificateStore;
+use App\Support\CourseAssessment;
 use App\Support\ExamResultStore;
 use App\Support\LearningResourceStore;
 use App\Support\PracticeTestStore;
@@ -50,6 +51,7 @@ class StudentPortalController extends Controller
     public function dashboard(Request $request)
     {
         $student = $this->requireStudent($request);
+        PracticeTestStore::installStarterSets([$student['course_code']??'']);
         $fee = (float) ($student['course_fee'] ?? 0);
         $paid = (float) ($student['paid_amount'] ?? 0);
         $student['course_fee'] = $fee;
@@ -75,7 +77,8 @@ class StudentPortalController extends Controller
             'learningResources' => array_values(array_filter(LearningResourceStore::all(), fn (array $row): bool => ($row['is_active'] ?? true) && ($row['course_code'] ?? '') === ($student['course_code'] ?? ''))),
             'assignmentSubmissions' => collect(AssignmentSubmissionStore::forStudent($student['id']))->keyBy('resource_id'),
             'practiceTests' => array_values(array_filter(PracticeTestStore::all(), fn (array $row): bool => ($row['is_active'] ?? true) && ($row['course_code'] ?? '') === ($student['course_code'] ?? ''))),
-            'practiceAttempts' => collect(PracticeTestStore::attemptsForStudent($student['id']))->groupBy('test_id')->map->first(),
+            'practiceAttempts' => collect(PracticeTestStore::attemptsForStudent($student['id']))->groupBy('test_id')->map(fn($attempts)=>$attempts->sortByDesc('percentage')->first()),
+            'assessment' => CourseAssessment::summary($student),
             'results' => array_values(array_filter(ExamResultStore::all(), fn (array $row): bool => ($row['student_id'] ?? '') === $student['id'])),
             'certificates' => array_values(array_filter(CertificateStore::all(), fn (array $row): bool => ($row['student_id'] ?? '') === $student['id'])),
         ]);
@@ -132,6 +135,7 @@ class StudentPortalController extends Controller
             'correct_answers'=>$correct,'total_questions'=>$total,'percentage'=>$percentage,
             'status'=>$percentage>=(float)$test['pass_percentage']?'pass':'fail','review'=>$review,
         ]);
+        CourseAssessment::publishIfEligible($student);
         return redirect()->route('student.practice.result',$attempt['id']);
     }
 
@@ -142,7 +146,7 @@ class StudentPortalController extends Controller
         abort_unless($attempt,404);
         $test=PracticeTestStore::find($attempt['test_id']);
         abort_unless($test,404);
-        return view('student.practice-result',['student'=>$student,'test'=>$test,'attempt'=>$attempt]);
+        return view('student.practice-result',['student'=>$student,'test'=>$test,'attempt'=>$attempt,'assessment'=>CourseAssessment::summary($student)]);
     }
 
     public function marksheet(Request $request, string $id)

@@ -37,6 +37,11 @@ class PracticeTestController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'assessment_type'=>$request->input('assessment_type','practice'),
+            'assessment_weight'=>$request->input('assessment_weight',20),
+            'assessment_order'=>$request->input('assessment_order',1),
+        ]);
         $questions=array_values(array_filter((array)$request->input('questions',[]),fn($q):bool=>trim((string)($q['prompt']??''))!==''));
         $request->merge(['questions'=>$questions]);
         $data=$request->validate([
@@ -44,6 +49,9 @@ class PracticeTestController extends Controller
             'title'=>['required','string','max:180'],
             'duration_minutes'=>['required','integer','min:1','max:180'],
             'pass_percentage'=>['required','numeric','min:1','max:100'],
+            'assessment_type'=>['required','in:practice,terminal,final'],
+            'assessment_weight'=>['required','numeric','min:1','max:100'],
+            'assessment_order'=>['required','integer','min:1','max:5'],
             'questions'=>['required','array','min:1','max:20'],
             'questions.*.prompt'=>['required','string','max:500'],
             'questions.*.option_a'=>['required','string','max:250'],
