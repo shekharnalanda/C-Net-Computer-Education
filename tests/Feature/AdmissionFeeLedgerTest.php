@@ -280,11 +280,11 @@ class AdmissionFeeLedgerTest extends TestCase
             ->assertSee('WhatsApp Reminder')
             ->assertDontSee('Paid Student');
 
-        $this->get(route('admin.fees.dues.export', ['payment_status' => 'partial']))
+        $export = $this->get(route('admin.fees.dues.export', ['payment_status' => 'partial']))
             ->assertOk()
-            ->assertHeader('content-type', 'text/csv; charset=UTF-8')
-            ->assertSee('Due Student')
-            ->assertDontSee('Paid Student');
+            ->assertHeader('content-type', 'text/csv; charset=UTF-8');
+        $this->assertStringContainsString('Due Student', $export->streamedContent());
+        $this->assertStringNotContainsString('Paid Student', $export->streamedContent());
     }
 
 }
