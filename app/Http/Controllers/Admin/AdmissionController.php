@@ -61,11 +61,15 @@ class AdmissionController extends Controller
         $search = strtolower(trim((string) $request->query('search')));
         $course = trim((string) $request->query('course'));
         $paymentStatus = trim((string) $request->query('payment_status'));
-        $items = array_values(array_filter($items, function (array $item) use ($search, $course, $paymentStatus): bool {
+        $batch = strtolower(trim((string) $request->query('batch')));
+        $studentStatus = trim((string) $request->query('student_status'));
+        $items = array_values(array_filter($items, function (array $item) use ($search, $course, $paymentStatus, $batch, $studentStatus): bool {
             $haystack = strtolower(($item['application_no'] ?? '').' '.($item['student_name'] ?? '').' '.($item['guardian_name'] ?? '').' '.($item['phone'] ?? ''));
             return (! $search || str_contains($haystack, $search))
                 && (! $course || ($item['course_code'] ?? '') === $course)
-                && (! $paymentStatus || ($item['payment_status'] ?? '') === $paymentStatus);
+                && (! $paymentStatus || ($item['payment_status'] ?? '') === $paymentStatus)
+                && (! $batch || str_contains(strtolower(($item['batch_name'] ?? '').' '.($item['batch_time'] ?? '')), $batch))
+                && (! $studentStatus || ($item['student_status'] ?? 'active') === $studentStatus);
         }));
 
         return view('admin.students.index', [
@@ -75,6 +79,20 @@ class AdmissionController extends Controller
             'totalBalance' => collect($items)->sum('balance_amount'),
             'courses' => Course::orderBy('title')->get(['code','title']),
         ]);
+    }
+
+    public function updateStudent(Request $request, string $id)
+    {
+        $data = $request->validate([
+            'roll_no' => ['nullable','string','max:40'],
+            'batch_name' => ['nullable','string','max:100'],
+            'batch_time' => ['nullable','string','max:100'],
+            'joining_date' => ['nullable','date'],
+            'student_status' => ['required','in:active,completed,discontinued'],
+        ]);
+        abort_unless(AdmissionStore::updateStudentRecord($id, $data), 404);
+
+        return back()->with('success', 'Student academic record updated.');
     }
 
     public function studentCard(string $id)

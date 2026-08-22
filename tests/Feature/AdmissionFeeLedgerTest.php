@@ -149,4 +149,50 @@ class AdmissionFeeLedgerTest extends TestCase
             ->assertOk()->assertSee('STUDENT ADMISSION CARD')->assertSee('Admitted Student');
     }
 
+
+    public function test_admin_can_assign_roll_number_and_batch(): void
+    {
+        Course::create([
+            'code' => 'DCA',
+            'title' => 'Diploma in Computer Applications',
+            'duration' => '6 Months',
+            'fee_amount' => 4500,
+            'level' => 'Foundation',
+            'summary' => 'Office skills',
+            'is_active' => true,
+        ]);
+        $student = AdmissionStore::add([
+            'student_name' => 'Batch Student',
+            'guardian_name' => 'Batch Guardian',
+            'phone' => '9876543210',
+            'city' => 'Bihar Sharif',
+            'course_code' => 'DCA',
+            'course_fee' => 4500,
+            'dob' => '2005-01-01',
+            'gender' => 'Male',
+            'qualification' => '12th',
+            'address' => 'Bihar Sharif',
+            'email' => '',
+            'preferred_time' => 'Morning',
+            'message' => '',
+        ]);
+        AdmissionStore::updateStatus($student['id'], 'admitted');
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $this->actingAs($admin)->patch(route('admin.students.update', $student['id']), [
+            'roll_no' => 'CNET-DCA-001',
+            'batch_name' => 'DCA Morning Batch',
+            'batch_time' => '08:00 AM - 10:00 AM',
+            'joining_date' => '2026-08-22',
+            'student_status' => 'active',
+        ])->assertRedirect();
+
+        $updated = AdmissionStore::find($student['id']);
+        $this->assertSame('CNET-DCA-001', $updated['roll_no']);
+        $this->assertSame('DCA Morning Batch', $updated['batch_name']);
+
+        $this->get(route('admin.students.card', $student['id']))
+            ->assertOk()->assertSee('CNET-DCA-001')->assertSee('DCA Morning Batch');
+    }
+
 }

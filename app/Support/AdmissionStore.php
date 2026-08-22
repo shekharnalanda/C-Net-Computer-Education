@@ -74,6 +74,18 @@ class AdmissionStore
         });
     }
 
+    public static function updateStudentRecord(string $id, array $data): bool
+    {
+        return self::update($id, function (array $item) use ($data): array {
+            $item['roll_no'] = $data['roll_no'] ?? null;
+            $item['batch_name'] = $data['batch_name'] ?? null;
+            $item['batch_time'] = $data['batch_time'] ?? null;
+            $item['joining_date'] = $data['joining_date'] ?? null;
+            $item['student_status'] = $data['student_status'] ?? 'active';
+            return $item;
+        });
+    }
+
     public static function remove(string $id): bool
     {
         $items = self::all();
