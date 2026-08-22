@@ -35,6 +35,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/admissions-export',[AdminAdmissionController::class,'export'])->name('admissions.export');
         Route::patch('/admissions/{id}/status',[AdminAdmissionController::class,'updateStatus'])->name('admissions.status');
         Route::patch('/admissions/{id}/payment',[AdminAdmissionController::class,'updatePayment'])->name('admissions.payment');
+        Route::get('/admissions/{id}/receipt',[AdminAdmissionController::class,'receipt'])->name('admissions.receipt');
         Route::delete('/admissions/{id}',[AdminAdmissionController::class,'destroy'])->name('admissions.destroy');
         Route::get('/jobs',[JobController::class,'index'])->name('jobs.index');
         Route::post('/jobs',[JobController::class,'store'])->name('jobs.store');
