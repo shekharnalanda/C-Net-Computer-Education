@@ -24,7 +24,32 @@
 <td><a href="tel:{{ preg_replace('/\s+/', '', $student['phone']) }}">{{ $student['phone'] }}</a></td>
 <td><span class="student-payment payment-{{ $student['payment_status'] }}">{{ ucfirst($student['payment_status']) }}</span><small>Paid ₹{{ number_format((float)$student['paid_amount'],2) }}</small></td>
 <td><b>₹{{ number_format((float)$student['balance_amount'],2) }}</b></td>
-<td><div class="student-actions"><button type="button" onclick="document.getElementById('student-{{ $student['id'] }}').showModal()">Edit Record</button><a href="{{ route('admin.students.card',$student['id']) }}" target="_blank">Student Card</a><a href="{{ route('admin.admissions.receipt',$student['id']) }}" target="_blank">Fee Receipt</a></div>
+<td>
+@php($studentResult = $latestResults->get($student['id']))
+@php($studentCertificate = $latestCertificates->get($student['id']))
+<div class="student-actions">
+<button type="button" onclick="document.getElementById('documents-{{ $student['id'] }}').showModal()">Documents</button>
+<button type="button" onclick="document.getElementById('student-{{ $student['id'] }}').showModal()">Edit Record</button>
+</div>
+<dialog class="student-record-dialog" id="documents-{{ $student['id'] }}">
+<div class="dialog-head"><div><small>ONE-CLICK DOCUMENTS</small><h2>{{ $student['student_name'] }}</h2></div><button type="button" onclick="this.closest('dialog').close()">×</button></div>
+<div class="student-actions document-actions">
+<a href="{{ route('admin.students.card',$student['id']) }}" target="_blank">Print ID Card</a>
+@if($studentResult)
+<a href="{{ route('admin.results.marksheet',$studentResult['id']) }}" target="_blank">Print Marksheet</a>
+@else
+<a href="{{ route('admin.results.index',['search'=>$student['application_no']]) }}">Create Result First</a>
+@endif
+@if($studentCertificate)
+<a href="{{ route('admin.certificates.print',$studentCertificate['id']) }}" target="_blank">Print Certificate</a>
+@elseif($studentResult && ($studentResult['result_status'] ?? '') === 'pass')
+<a href="{{ route('admin.certificates.index',['student_id'=>$student['id']]) }}">Issue Certificate</a>
+@else
+<span>Certificate will be available after a passing result.</span>
+@endif
+<a href="{{ route('admin.admissions.receipt',$student['id']) }}" target="_blank">Print Fee Receipt</a>
+</div>
+</dialog>
 <dialog class="student-record-dialog" id="student-{{ $student['id'] }}"><div class="dialog-head"><div><small>ACADEMIC RECORD</small><h2>{{ $student['student_name'] }}</h2></div><button type="button" onclick="this.closest('dialog').close()">×</button></div>
 <form class="form-grid" method="post" action="{{ route('admin.students.update',$student['id']) }}">@csrf @method('PATCH')
 <label>Roll Number<input name="roll_no" value="{{ $student['roll_no'] ?? '' }}" maxlength="40" placeholder="e.g. CNET-DCA-001"></label>
