@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Support\AdmissionStore;
+use App\Support\SiteSettings;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -52,6 +53,20 @@ class AdmissionController extends Controller
         abort_unless(AdmissionStore::updatePayment($id, (float) $data['course_fee'], (float) $data['paid_amount'], $data['payment_note'] ?? null), 404);
 
         return back()->with('success', 'Fee record updated successfully.');
+    }
+
+    public function receipt(string $id)
+    {
+        $item = AdmissionStore::find($id);
+        abort_unless($item, 404);
+        $application = $this->withFinancialDefaults([$item])[0];
+        $course = Course::where('code', $application['course_code'] ?? '')->first();
+
+        return view('admin.admissions.receipt', [
+            'application' => $application,
+            'course' => $course,
+            'settings' => SiteSettings::all(),
+        ]);
     }
 
     public function destroy(string $id)
