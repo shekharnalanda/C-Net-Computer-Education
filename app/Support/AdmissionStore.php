@@ -42,6 +42,7 @@ class AdmissionStore
             'balance_amount' => $courseFee,
             'payment_status' => 'unpaid',
             'receipt_no' => null,
+            'payments' => [],
             'created_at' => now()->toIso8601String(),
         ]);
         array_unshift($items, $item);
