@@ -43,3 +43,7 @@
 /* Header admin access */
 .site-header nav .admin-nav-link{color:#fff;background:var(--ink);padding:10px 14px;border-radius:999px;white-space:nowrap}
 .site-header nav .admin-nav-link:hover{color:#fff;background:var(--blue)}
+
+/* Course fee display */
+.course-fee{display:inline-flex;align-items:center;width:max-content;margin:9px 0 0;padding:7px 10px;border-radius:999px;background:#e7f7ee;color:#087548;font-size:12px;font-weight:900}
+.course-facts .fee-note{display:block;margin-top:6px;color:#6d7f8f;font-size:10px;font-weight:600;line-height:1.4}
