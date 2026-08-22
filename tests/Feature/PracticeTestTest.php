@@ -5,6 +5,9 @@ namespace Tests\Feature;
 use App\Models\Course;
 use App\Models\User;
 use App\Support\AdmissionStore;
+use App\Support\CertificateStore;
+use App\Support\CourseAssessment;
+use App\Support\ExamResultStore;
 use App\Support\PracticeTestStore;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -16,7 +19,7 @@ class PracticeTestTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        foreach(['cnet-admissions.json','cnet-practice-tests.json','cnet-practice-attempts.json'] as $file) @unlink(storage_path('app/'.$file));
+        foreach(['cnet-admissions.json','cnet-practice-tests.json','cnet-practice-attempts.json','cnet-exam-results.json','cnet-certificates.json'] as $file) @unlink(storage_path('app/'.$file));
         foreach([['DCA','Diploma in Computer Applications'],['TALLY','Tally Prime']] as [$code,$title]){
             Course::create(['code'=>$code,'title'=>$title,'duration'=>'6 Months','fee_amount'=>6000,'level'=>'Foundation','summary'=>'Course','is_active'=>true]);
         }
@@ -24,7 +27,7 @@ class PracticeTestTest extends TestCase
 
     protected function tearDown(): void
     {
-        foreach(['cnet-admissions.json','cnet-practice-tests.json','cnet-practice-attempts.json'] as $file) @unlink(storage_path('app/'.$file));
+        foreach(['cnet-admissions.json','cnet-practice-tests.json','cnet-practice-attempts.json','cnet-exam-results.json','cnet-certificates.json'] as $file) @unlink(storage_path('app/'.$file));
         parent::tearDown();
     }
 
@@ -77,6 +80,27 @@ class PracticeTestTest extends TestCase
         ]);
         $this->withSession(['student_portal_id'=>$first['id']])->get(route('student.practice.take',$otherTest['id']))->assertNotFound();
         $this->withSession(['student_portal_id'=>$first['id']])->get(route('student.practice.result',$attempt['id']))->assertNotFound();
+    }
+
+    public function test_five_course_assessments_publish_final_marksheet_and_certificate(): void
+    {
+        $student=$this->admittedStudent();
+        $this->assertSame(5,PracticeTestStore::installStarterSets(['DCA']));
+        foreach(PracticeTestStore::all() as $test){
+            if(($test['course_code']??'')!=='DCA') continue;
+            PracticeTestStore::recordAttempt([
+                'test_id'=>$test['id'],'student_id'=>$student['id'],'course_code'=>'DCA',
+                'correct_answers'=>5,'total_questions'=>5,'percentage'=>100,'status'=>'pass','review'=>[],
+            ]);
+        }
+        $summary=CourseAssessment::publishIfEligible($student);
+        $this->assertTrue($summary['passed']);
+        $this->assertSame(100.0,$summary['percentage']);
+        $this->assertCount(1,ExamResultStore::all());
+        $this->assertCount(1,CertificateStore::all());
+        CourseAssessment::publishIfEligible($student);
+        $this->assertCount(1,ExamResultStore::all());
+        $this->assertCount(1,CertificateStore::all());
     }
 
     private function admittedStudent(string $name='Practice Student',string $phone='9876543210'): array
