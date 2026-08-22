@@ -6,7 +6,7 @@ class StarterPracticeTests
 {
     public static function all(): array
     {
-        return [
+        $base = [
             self::test('DCA','DCA Computer Fundamentals – Set 1',[
                 ['CPU का पूरा नाम क्या है?','Central Processing Unit','Computer Processing User','Central Print Unit','Control Program Unit','A'],
                 ['MS Word मुख्य रूप से किस काम के लिए है?','Video editing','Document creation','Accounting','Programming','B'],
@@ -92,6 +92,32 @@ class StarterPracticeTests
                 ['Spreadsheet में row और column के intersection को क्या कहते हैं?','Cell','Slide','Layer','Voucher','A'],
             ]),
         ];
+
+        $sets=[];
+        foreach($base as $test){
+            foreach([
+                [1,'practice','Practice Test 1',10,15,40],
+                [2,'practice','Practice Test 2',10,15,40],
+                [3,'terminal','Terminal Test 1',20,25,40],
+                [4,'terminal','Terminal Test 2',20,25,40],
+                [5,'final','Final Test',40,40,40],
+            ] as [$setNo,$type,$label,$weight,$minutes,$pass]){
+                $copy=$test;
+                $copy['starter_key']=strtolower($test['course_code']).'-set-'.$setNo;
+                $copy['title']=$test['course_code'].' '.$label;
+                $copy['assessment_type']=$type;
+                $copy['assessment_order']=$setNo;
+                $copy['assessment_weight']=$weight;
+                $copy['duration_minutes']=$minutes;
+                $copy['pass_percentage']=$pass;
+                $copy['questions']=array_values(array_map(function(array $question,int $index)use($test,$setNo):array{
+                    $question['id']='starter-'.strtolower($test['course_code']).'-s'.$setNo.'-q'.($index+1);
+                    return $question;
+                },$test['questions'],array_keys($test['questions'])));
+                $sets[]=$copy;
+            }
+        }
+        return $sets;
     }
 
     private static function test(string $course,string $title,array $questions): array
