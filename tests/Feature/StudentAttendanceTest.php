@@ -53,7 +53,7 @@ class StudentAttendanceTest extends TestCase
 
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin)->get(route('admin.attendance.index', ['date' => '2026-08-22']))
-            ->assertOk()->assertSee('Attendance Student')->assertSee('Daily Attendance Register', false);
+            ->assertOk()->assertSee('Attendance Student')->assertSee('DAILY ATTENDANCE REGISTER');
 
         $this->post(route('admin.attendance.store'), [
             'date' => '2026-08-22',
