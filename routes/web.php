@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\NoticeController;
 use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ResultController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\AdmissionController;
 use App\Http\Controllers\EnquiryController;
@@ -32,6 +33,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');
         Route::put('/profile',[ProfileController::class,'update'])->name('profile.update');
         Route::put('/profile/password',[ProfileController::class,'updatePassword'])->name('profile.password');
+        Route::get('/results',[ResultController::class,'index'])->name('results.index');
+        Route::post('/results',[ResultController::class,'store'])->name('results.store');
+        Route::get('/results/{id}/marksheet',[ResultController::class,'marksheet'])->name('results.marksheet');
+        Route::delete('/results/{id}',[ResultController::class,'destroy'])->name('results.destroy');
         Route::get('/attendance',[AttendanceController::class,'index'])->name('attendance.index');
         Route::post('/attendance',[AttendanceController::class,'store'])->name('attendance.store');
         Route::get('/attendance-export',[AttendanceController::class,'export'])->name('attendance.export');

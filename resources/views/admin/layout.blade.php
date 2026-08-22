@@ -8,6 +8,7 @@
 <a class="{{ request()->routeIs('admin.fees.dues') ? 'active' : '' }}" href="{{ route('admin.fees.dues') }}">₹ Fee Dues</a>
 <a class="{{ request()->routeIs('admin.fees.collections') ? 'active' : '' }}" href="{{ route('admin.fees.collections') }}">▤ Collection Report</a>
 <a class="{{ request()->routeIs('admin.attendance.*') ? 'active' : '' }}" href="{{ route('admin.attendance.index') }}">◫ Attendance</a>
+<a class="{{ request()->routeIs('admin.results.*') ? 'active' : '' }}" href="{{ route('admin.results.index') }}">★ Exams & Results</a>
 <a class="{{ request()->routeIs('admin.enquiries.*') ? 'active' : '' }}" href="{{ route('admin.enquiries.index') }}">✉ Enquiries</a>
 <a class="{{ request()->routeIs('admin.jobs.*') ? 'active' : '' }}" href="{{ route('admin.jobs.index') }}">⌕ Job Opportunities</a>
 <a class="{{ request()->routeIs('admin.notices.*') ? 'active' : '' }}" href="{{ route('admin.notices.index') }}">◆ Notices</a>
