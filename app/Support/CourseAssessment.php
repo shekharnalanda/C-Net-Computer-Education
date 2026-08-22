@@ -46,6 +46,7 @@ class CourseAssessment
             ],$summary['rows']);
             $result=ExamResultStore::add([
                 'source'=>$source,'student_id'=>$student['id'],'exam_name'=>'Course Final Assessment',
+                'is_demo'=>(bool)($student['is_demo']??false),
                 'exam_date'=>now()->toDateString(),'subjects'=>$subjects,'max_total'=>500,
                 'obtained_total'=>(float)collect($subjects)->sum('obtained_marks'),
                 'percentage'=>$summary['percentage'],'grade'=>$summary['grade'],'result_status'=>'pass',
@@ -57,6 +58,7 @@ class CourseAssessment
             $course=Course::where('code',$student['course_code']??'')->first();
             $certificate=CertificateStore::add([
                 'source'=>$source,'student_id'=>$student['id'],'type'=>'completion',
+                'is_demo'=>(bool)($student['is_demo']??false),
                 'title'=>'Certificate of Course Completion','issue_date'=>now()->toDateString(),
                 'completion_date'=>now()->toDateString(),'grade'=>$summary['grade'],
                 'description'=>'Successfully completed '.($course?->title??($student['course_code']??'the course')).' with '.$summary['percentage'].'%.',

@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\CertificateController as AdminCertificateController;
 use App\Http\Controllers\Admin\CommunicationController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DemoDataController;
 use App\Http\Controllers\Admin\EnquiryController as AdminEnquiryController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\NoticeController;
@@ -59,6 +60,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/certificates/{id}/print',[AdminCertificateController::class,'print'])->name('certificates.print');
         Route::delete('/certificates/{id}',[AdminCertificateController::class,'destroy'])->name('certificates.destroy');
         Route::get('/production-audit',[ProductionAuditController::class,'index'])->name('audit.index');
+        Route::get('/demo-data',[DemoDataController::class,'index'])->name('demo-data.index');
+        Route::post('/demo-data',[DemoDataController::class,'install'])->name('demo-data.install');
+        Route::delete('/demo-data',[DemoDataController::class,'destroy'])->name('demo-data.destroy');
         Route::get('/production-audit.json',[ProductionAuditController::class,'json'])->name('audit.json');
         Route::get('/backup',[BackupController::class,'index'])->name('backup.index');
         Route::get('/backup/download',[BackupController::class,'download'])->name('backup.download');

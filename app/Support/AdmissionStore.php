@@ -125,6 +125,14 @@ class AdmissionStore
         return true;
     }
 
+    public static function removeDemoData(): array
+    {
+        $items=self::all();
+        $ids=array_values(array_column(array_filter($items,fn(array $item):bool=>(bool)($item['is_demo']??false)),'id'));
+        if($ids) self::write(array_values(array_filter($items,fn(array $item):bool=>!in_array($item['id']??'',$ids,true))));
+        return $ids;
+    }
+
     private static function update(string $id, callable $callback): bool
     {
         $items = self::all();
