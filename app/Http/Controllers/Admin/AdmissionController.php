@@ -153,7 +153,7 @@ class AdmissionController extends Controller
     {
         $items = array_values(array_filter(
             $this->withFinancialDefaults(AdmissionStore::all()),
-            fn (array $item): bool => ($item['status'] ?? '') === 'admitted' && (float) $item['balance_amount'] > 0
+            fn (array $item): bool => !($item['is_demo']??false) && ($item['status'] ?? '') === 'admitted' && (float) $item['balance_amount'] > 0
         ));
         $search = strtolower(trim((string) $request->query('search')));
         $course = trim((string) $request->query('course'));
@@ -258,7 +258,7 @@ class AdmissionController extends Controller
 
     public function export(): StreamedResponse
     {
-        $items = $this->withFinancialDefaults(AdmissionStore::all());
+        $items = $this->withFinancialDefaults(array_values(array_filter(AdmissionStore::all(),fn(array $item):bool=>!($item['is_demo']??false))));
 
         return response()->streamDownload(function () use ($items) {
             $output = fopen('php://output', 'w');
@@ -287,6 +287,7 @@ class AdmissionController extends Controller
         $transactions = [];
 
         foreach ($this->withFinancialDefaults(AdmissionStore::all()) as $application) {
+            if($application['is_demo']??false) continue;
             foreach ($application['payments'] as $payment) {
                 $date = \Carbon\Carbon::parse($payment['payment_date']);
                 $haystack = strtolower(($application['student_name'] ?? '').' '.($application['application_no'] ?? '').' '.($application['roll_no'] ?? '').' '.($payment['receipt_no'] ?? '').' '.($payment['reference'] ?? ''));
