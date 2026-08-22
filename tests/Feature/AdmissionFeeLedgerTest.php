@@ -238,4 +238,53 @@ class AdmissionFeeLedgerTest extends TestCase
         $this->assertSame(2500.0, (float) AdmissionStore::find($application['id'])['paid_amount']);
     }
 
+
+    public function test_admin_can_filter_export_and_remind_students_with_fee_dues(): void
+    {
+        Course::create([
+            'code' => 'DCA', 'title' => 'Diploma in Computer Applications',
+            'duration' => '6 Months', 'fee_amount' => 4500,
+            'level' => 'Foundation', 'summary' => 'Office skills', 'is_active' => true,
+        ]);
+        $student = AdmissionStore::add([
+            'student_name' => 'Due Student', 'guardian_name' => 'Guardian',
+            'phone' => '9876543210', 'city' => 'Bihar Sharif', 'course_code' => 'DCA',
+            'course_fee' => 4500, 'dob' => '2005-01-01', 'gender' => 'Male',
+            'qualification' => '12th', 'address' => 'Bihar Sharif', 'email' => '',
+            'preferred_time' => 'Morning', 'message' => '',
+        ]);
+        AdmissionStore::updateStatus($student['id'], 'admitted');
+        AdmissionStore::updatePayment($student['id'], 4500, 1500, 'Opening payment');
+        AdmissionStore::updateStudentRecord($student['id'], [
+            'roll_no' => 'CNET-DCA-010', 'batch_name' => 'Morning',
+            'batch_time' => '08:00 AM', 'joining_date' => now()->subDays(65)->toDateString(),
+            'student_status' => 'active',
+        ]);
+
+        $paid = AdmissionStore::add([
+            'student_name' => 'Paid Student', 'guardian_name' => 'Guardian',
+            'phone' => '9999999999', 'city' => 'Bihar Sharif', 'course_code' => 'DCA',
+            'course_fee' => 4500, 'dob' => '2005-01-01', 'gender' => 'Female',
+            'qualification' => '12th', 'address' => 'Bihar Sharif', 'email' => '',
+            'preferred_time' => 'Morning', 'message' => '',
+        ]);
+        AdmissionStore::updateStatus($paid['id'], 'admitted');
+        AdmissionStore::updatePayment($paid['id'], 4500, 4500, 'Paid in full');
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $this->actingAs($admin)->get(route('admin.fees.dues', ['age' => '60']))
+            ->assertOk()
+            ->assertSee('Fee Due Report')
+            ->assertSee('Due Student')
+            ->assertSee('CNET-DCA-010')
+            ->assertSee('WhatsApp Reminder')
+            ->assertDontSee('Paid Student');
+
+        $this->get(route('admin.fees.dues.export', ['payment_status' => 'partial']))
+            ->assertOk()
+            ->assertHeader('content-type', 'text/csv; charset=UTF-8')
+            ->assertSee('Due Student')
+            ->assertDontSee('Paid Student');
+    }
+
 }
