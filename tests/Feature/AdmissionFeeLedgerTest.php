@@ -195,4 +195,47 @@ class AdmissionFeeLedgerTest extends TestCase
             ->assertOk()->assertSee('CNET-DCA-001')->assertSee('DCA Morning Batch');
     }
 
+
+    public function test_admin_can_record_multiple_installments_and_print_each_receipt(): void
+    {
+        Course::create([
+            'code' => 'DCA', 'title' => 'Diploma in Computer Applications',
+            'duration' => '6 Months', 'fee_amount' => 4500,
+            'level' => 'Foundation', 'summary' => 'Office skills', 'is_active' => true,
+        ]);
+        $application = AdmissionStore::add([
+            'student_name' => 'Installment Student', 'guardian_name' => 'Guardian',
+            'phone' => '9876543210', 'city' => 'Bihar Sharif', 'course_code' => 'DCA',
+            'course_fee' => 4500, 'dob' => '2005-01-01', 'gender' => 'Male',
+            'qualification' => '12th', 'address' => 'Bihar Sharif', 'email' => '',
+            'preferred_time' => 'Morning', 'message' => '',
+        ]);
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $this->actingAs($admin)->post(route('admin.admissions.payments.store', $application['id']), [
+            'amount' => 1500, 'payment_date' => '2026-08-22', 'mode' => 'cash',
+            'reference' => '', 'note' => 'First installment',
+        ])->assertRedirect();
+        $this->post(route('admin.admissions.payments.store', $application['id']), [
+            'amount' => 1000, 'payment_date' => '2026-08-22', 'mode' => 'upi',
+            'reference' => 'UPI-12345', 'note' => 'Second installment',
+        ])->assertRedirect();
+
+        $updated = AdmissionStore::find($application['id']);
+        $this->assertCount(2, $updated['payments']);
+        $this->assertNotSame($updated['payments'][0]['receipt_no'], $updated['payments'][1]['receipt_no']);
+        $this->assertSame(2500.0, (float) $updated['paid_amount']);
+        $this->assertSame(2000.0, (float) $updated['balance_amount']);
+        $this->assertSame('partial', $updated['payment_status']);
+
+        $payment = $updated['payments'][1];
+        $this->get(route('admin.admissions.payments.receipt', [$application['id'], $payment['id']]))
+            ->assertOk()->assertSee('INSTALLMENT RECEIPT')->assertSee('UPI-12345')->assertSee('1,000.00');
+
+        $this->post(route('admin.admissions.payments.store', $application['id']), [
+            'amount' => 2500, 'payment_date' => '2026-08-22', 'mode' => 'cash',
+        ])->assertSessionHasErrors('amount');
+        $this->assertSame(2500.0, (float) AdmissionStore::find($application['id'])['paid_amount']);
+    }
+
 }
