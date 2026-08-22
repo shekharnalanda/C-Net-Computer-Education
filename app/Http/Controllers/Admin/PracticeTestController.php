@@ -13,6 +13,7 @@ class PracticeTestController extends Controller
 {
     public function index(Request $request)
     {
+        $starterCount=PracticeTestStore::installStarterSets(Course::where('is_active',true)->pluck('code')->all());
         $search=strtolower(trim((string)$request->query('search')));
         $course=trim((string)$request->query('course'));
         $attempts=PracticeTestStore::attempts();
@@ -29,6 +30,7 @@ class PracticeTestController extends Controller
             'tests'=>$tests,'attempts'=>array_slice($attempts,0,50),
             'courses'=>Course::orderBy('title')->get(['code','title']),
             'activeCount'=>collect($tests)->where('is_active',true)->count(),
+            'starterCount'=>$starterCount,
             'attemptCount'=>count($attempts),
         ]);
     }
