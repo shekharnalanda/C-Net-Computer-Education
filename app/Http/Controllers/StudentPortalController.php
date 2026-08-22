@@ -7,6 +7,7 @@ use App\Support\AdmissionStore;
 use App\Support\AttendanceStore;
 use App\Support\CertificateStore;
 use App\Support\ExamResultStore;
+use App\Support\LearningResourceStore;
 use App\Support\SiteSettings;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
@@ -65,6 +66,7 @@ class StudentPortalController extends Controller
             'attendance' => $attendance,
             'attendanceCounts' => $attendanceCounts,
             'attendanceRate' => $attendanceRate,
+            'learningResources' => array_values(array_filter(LearningResourceStore::all(), fn (array $row): bool => ($row['is_active'] ?? true) && ($row['course_code'] ?? '') === ($student['course_code'] ?? ''))),
             'results' => array_values(array_filter(ExamResultStore::all(), fn (array $row): bool => ($row['student_id'] ?? '') === $student['id'])),
             'certificates' => array_values(array_filter(CertificateStore::all(), fn (array $row): bool => ($row['student_id'] ?? '') === $student['id'])),
         ]);
