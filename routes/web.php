@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\AttendanceController;
+use App\Http\Controllers\Admin\AssignmentSubmissionController;
 use App\Http\Controllers\Admin\AdmissionController as AdminAdmissionController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\CertificateController as AdminCertificateController;
@@ -28,6 +29,7 @@ Route::get('/student/login', [StudentPortalController::class,'showLogin'])->name
 Route::post('/student/login', [StudentPortalController::class,'login'])->middleware('throttle:5,1')->name('student.login.submit');
 Route::get('/student', [StudentPortalController::class,'dashboard'])->name('student.dashboard');
 Route::post('/student/logout', [StudentPortalController::class,'logout'])->name('student.logout');
+Route::post('/student/assignments', [StudentPortalController::class,'submitAssignment'])->middleware('throttle:10,1')->name('student.assignments.submit');
 Route::get('/student/results/{id}/marksheet', [StudentPortalController::class,'marksheet'])->name('student.results.marksheet');
 Route::get('/student/certificates/{id}/print', [StudentPortalController::class,'certificate'])->name('student.certificates.print');
 Route::get('/apply-online', [AdmissionController::class,'create'])->name('admission.create');
@@ -48,6 +50,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/certificates',[AdminCertificateController::class,'store'])->name('certificates.store');
         Route::get('/certificates/{id}/print',[AdminCertificateController::class,'print'])->name('certificates.print');
         Route::delete('/certificates/{id}',[AdminCertificateController::class,'destroy'])->name('certificates.destroy');
+        Route::get('/assignments',[AssignmentSubmissionController::class,'index'])->name('assignments.index');
+        Route::patch('/assignments/{id}/review',[AssignmentSubmissionController::class,'review'])->name('assignments.review');
+        Route::delete('/assignments/{id}',[AssignmentSubmissionController::class,'destroy'])->name('assignments.destroy');
         Route::get('/learning',[LearningResourceController::class,'index'])->name('learning.index');
         Route::post('/learning',[LearningResourceController::class,'store'])->name('learning.store');
         Route::patch('/learning/{id}/toggle',[LearningResourceController::class,'toggle'])->name('learning.toggle');
