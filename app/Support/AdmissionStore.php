@@ -42,6 +42,7 @@ class AdmissionStore
             'balance_amount' => $courseFee,
             'payment_status' => 'unpaid',
             'receipt_no' => null,
+            'payments' => [],
             'created_at' => now()->toIso8601String(),
         ]);
         array_unshift($items, $item);
@@ -70,6 +71,33 @@ class AdmissionStore
             if ($paidAmount > 0 && empty($item['receipt_no'])) {
                 $item['receipt_no'] = 'CNET-R'.now()->format('ymd').'-'.strtoupper(Str::random(4));
             }
+            return $item;
+        });
+    }
+
+    public static function addPaymentTransaction(string $id, float $amount, string $date, string $mode, ?string $reference = null, ?string $note = null): bool
+    {
+        return self::update($id, function (array $item) use ($amount, $date, $mode, $reference, $note): array {
+            $receiptNo = 'CNET-R'.now()->format('ymd').'-'.strtoupper(Str::random(5));
+            $payments = is_array($item['payments'] ?? null) ? $item['payments'] : [];
+            $payments[] = [
+                'id' => (string) Str::uuid(),
+                'receipt_no' => $receiptNo,
+                'payment_date' => $date,
+                'amount' => $amount,
+                'mode' => $mode,
+                'reference' => $reference,
+                'note' => $note,
+                'created_at' => now()->toIso8601String(),
+            ];
+            $courseFee = (float) ($item['course_fee'] ?? 0);
+            $paidAmount = (float) ($item['paid_amount'] ?? 0) + $amount;
+            $balance = max(0, $courseFee - $paidAmount);
+            $item['payments'] = $payments;
+            $item['paid_amount'] = $paidAmount;
+            $item['balance_amount'] = $balance;
+            $item['payment_status'] = $balance <= 0 ? 'paid' : 'partial';
+            $item['receipt_no'] = $receiptNo;
             return $item;
         });
     }
