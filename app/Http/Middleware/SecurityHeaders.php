@@ -22,7 +22,7 @@ class SecurityHeaders
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000');
         }
 
-        if ($request->is('admin') || $request->is('admin/*')) {
+        if ($request->is('admin') || $request->is('admin/*') || $request->is('student') || $request->is('student/*')) {
             $response->headers->set('Cache-Control', 'no-store, private');
         }
 
