@@ -79,6 +79,22 @@ class AdmissionController extends Controller
         return back()->with('success', 'New fee payment recorded successfully.');
     }
 
+    public function paymentReceipt(string $id, string $paymentId)
+    {
+        $item = AdmissionStore::find($id);
+        abort_unless($item, 404);
+        $application = $this->withFinancialDefaults([$item])[0];
+        $payment = collect($application['payments'])->firstWhere('id', $paymentId);
+        abort_unless($payment, 404);
+
+        return view('admin.admissions.payment-receipt', [
+            'application' => $application,
+            'payment' => $payment,
+            'course' => Course::where('code', $application['course_code'] ?? '')->first(),
+            'settings' => SiteSettings::all(),
+        ]);
+    }
+
     public function students(Request $request)
     {
         $items = array_values(array_filter($this->withFinancialDefaults(AdmissionStore::all()), fn (array $item) => ($item['status'] ?? '') === 'admitted'));
@@ -183,6 +199,7 @@ class AdmissionController extends Controller
             $item['paid_amount'] = $paid;
             $item['balance_amount'] = (float) ($item['balance_amount'] ?? max(0, $fee - $paid));
             $item['payment_status'] = $item['payment_status'] ?? ($paid <= 0 ? 'unpaid' : ($item['balance_amount'] > 0 ? 'partial' : 'paid'));
+            $item['payments'] = is_array($item['payments'] ?? null) ? $item['payments'] : [];
             return $item;
         }, $items);
     }
