@@ -2,10 +2,13 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class SecurityAndMobileTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_public_response_has_security_headers(): void
     {
         $response = $this->get('/admin/login');
