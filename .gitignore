@@ -38,3 +38,5 @@ Thumbs.db
 /storage/app/cnet-certificates.json
 /storage/app/cnet-learning-resources.json
 /storage/app/cnet-assignment-submissions.json
+/storage/app/cnet-practice-tests.json
+/storage/app/cnet-practice-attempts.json
