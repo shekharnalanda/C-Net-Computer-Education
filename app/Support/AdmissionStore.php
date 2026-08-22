@@ -20,6 +20,15 @@ class AdmissionStore
         return $items;
     }
 
+    public static function find(string $id): ?array
+    {
+        foreach (self::all() as $item) {
+            if (($item['id'] ?? '') === $id) return $item;
+        }
+
+        return null;
+    }
+
     public static function add(array $data): array
     {
         $items = self::all();
