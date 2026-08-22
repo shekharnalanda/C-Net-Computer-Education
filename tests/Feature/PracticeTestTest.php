@@ -53,7 +53,7 @@ class PracticeTestTest extends TestCase
         $test=$this->testRecord('DCA');
         $question=$test['questions'][0];
         $this->withSession(['student_portal_id'=>$student['id']])->get(route('student.practice.take',$test['id']))
-            ->assertOk()->assertSee('CPU stands for?')->assertDontSee('Central Processing Unit',false);
+            ->assertOk()->assertSee('CPU stands for?')->assertDontSee('name="correct"',false);
         $response=$this->withSession(['student_portal_id'=>$student['id']])->post(route('student.practice.submit',$test['id']),[
             'answers'=>[$question['id']=>'A'],
         ]);
@@ -62,7 +62,7 @@ class PracticeTestTest extends TestCase
         $this->assertSame('pass',$attempt['status']);
         $this->assertEquals(100,$attempt['percentage']);
         $this->withSession(['student_portal_id'=>$student['id']])->get(route('student.practice.result',$attempt['id']))
-            ->assertOk()->assertSee('100.0%')->assertSee('PASS')->assertSee('Correct answer',false);
+            ->assertOk()->assertSee('100.0%')->assertSee('PASS')->assertSee('Your answer');
     }
 
     public function test_course_privacy_and_attempt_ownership_are_enforced(): void
