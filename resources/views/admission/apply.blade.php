@@ -14,7 +14,7 @@
 <label class="full">Full Address / पूरा पता *<textarea name="address" rows="3" required maxlength="300">{{ old('address') }}</textarea></label>
 <label>City / शहर *<input name="city" value="{{ old('city',$settings['city']) }}" required maxlength="100"></label>
 <label>Qualification / योग्यता *<input name="qualification" value="{{ old('qualification') }}" required maxlength="150" placeholder="10th / 12th / Graduate"></label>
-<label>Course Applied For *<select name="course_code" required><option value="">Select course</option>@foreach($courses as $course)<option value="{{ $course->code }}" @selected(old('course_code')===$course->code)>{{ $course->code }} — {{ $course->title }}</option>@endforeach</select></label>
+<label>Course Applied For *<select name="course_code" required><option value="">Select course</option>@foreach($courses as $course)<option value="{{ $course->code }}" @selected(old('course_code')===$course->code)>{{ $course->code }} — {{ $course->title }} — {{ $course->fee_amount !== null ? '₹'.number_format((float) $course->fee_amount, 2) : 'Fee on enquiry' }}</option>@endforeach</select></label>
 <label>Preferred Batch Time<input name="preferred_time" value="{{ old('preferred_time') }}" maxlength="100" placeholder="Morning / Afternoon / Evening"></label>
 <label class="full">Message / विशेष जानकारी<textarea name="message" rows="3" maxlength="800">{{ old('message') }}</textarea></label>
 <label class="hp">Leave empty<input name="website" tabindex="-1"></label>
