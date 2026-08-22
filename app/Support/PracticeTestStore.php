@@ -22,6 +22,17 @@ class PracticeTestStore
         return null;
     }
 
+    public static function installStarterSets(array $courseCodes): int
+    {
+        if (count(self::all()) > 0) return 0;
+        $allowed=array_flip(array_map('strtoupper',$courseCodes));
+        $count=0;
+        foreach(StarterPracticeTests::all() as $test){
+            if(isset($allowed[strtoupper($test['course_code'])])){ self::add($test); $count++; }
+        }
+        return $count;
+    }
+
     public static function add(array $data): array
     {
         $items = self::all();
