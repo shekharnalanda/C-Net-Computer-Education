@@ -5,7 +5,8 @@
 <a class="{{ request()->routeIs('admin.courses.*') ? 'active' : '' }}" href="{{ route('admin.courses.index') }}">▣ Courses</a>
 <a class="{{ request()->routeIs('admin.admissions.*') ? 'active' : '' }}" href="{{ route('admin.admissions.index') }}">✓ Admissions</a>
 <a class="{{ request()->routeIs('admin.students.*') ? 'active' : '' }}" href="{{ route('admin.students.index') }}">♟ Students</a>
-<a class="{{ request()->routeIs('admin.fees.*') ? 'active' : '' }}" href="{{ route('admin.fees.dues') }}">₹ Fee Dues</a>
+<a class="{{ request()->routeIs('admin.fees.dues') ? 'active' : '' }}" href="{{ route('admin.fees.dues') }}">₹ Fee Dues</a>
+<a class="{{ request()->routeIs('admin.fees.collections') ? 'active' : '' }}" href="{{ route('admin.fees.collections') }}">▤ Collection Report</a>
 <a class="{{ request()->routeIs('admin.attendance.*') ? 'active' : '' }}" href="{{ route('admin.attendance.index') }}">◫ Attendance</a>
 <a class="{{ request()->routeIs('admin.enquiries.*') ? 'active' : '' }}" href="{{ route('admin.enquiries.index') }}">✉ Enquiries</a>
 <a class="{{ request()->routeIs('admin.jobs.*') ? 'active' : '' }}" href="{{ route('admin.jobs.index') }}">⌕ Job Opportunities</a>
