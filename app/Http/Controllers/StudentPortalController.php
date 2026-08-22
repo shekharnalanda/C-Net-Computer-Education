@@ -11,6 +11,7 @@ use App\Support\ExamResultStore;
 use App\Support\LearningResourceStore;
 use App\Support\PracticeTestStore;
 use App\Support\SiteSettings;
+use App\Support\StudentProgress;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -64,6 +65,7 @@ class StudentPortalController extends Controller
 
         return view('student.dashboard', [
             'student' => $student,
+            'progress' => StudentProgress::calculate($student),
             'course' => Course::where('code', $student['course_code'] ?? '')->first(),
             'attendance' => $attendance,
             'attendanceCounts' => $attendanceCounts,
