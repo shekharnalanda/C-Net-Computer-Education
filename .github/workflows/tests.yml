@@ -21,6 +21,12 @@ jobs:
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: database/database.sqlite
+      - run: php artisan route:cache && php artisan view:cache
+        env:
+          APP_ENV: testing
+          APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
       - run: php artisan test
         env:
           APP_ENV: testing
