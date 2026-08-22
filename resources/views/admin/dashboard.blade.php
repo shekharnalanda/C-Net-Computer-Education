@@ -4,6 +4,7 @@
 <div class="quick-actions">
     <a href="{{ route('admin.courses.index') }}"><span>＋</span><div><b>Add or Edit Course</b><small>Manage website course details</small></div></a>
     <a href="{{ route('admin.enquiries.index') }}"><span>✉</span><div><b>View Enquiries</b><small>Contact prospective students</small></div></a>
+    <a href="{{ route('admin.students.index') }}"><span>♟</span><div><b>Students Register</b><small>Admitted students and fee balances</small></div></a>
     <a href="{{ route('home') }}" target="_blank"><span>↗</span><div><b>Open Website</b><small>Check the public home page</small></div></a>
 </div>
 

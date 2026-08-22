@@ -55,6 +55,41 @@ class AdmissionController extends Controller
         return back()->with('success', 'Fee record updated successfully.');
     }
 
+    public function students(Request $request)
+    {
+        $items = array_values(array_filter($this->withFinancialDefaults(AdmissionStore::all()), fn (array $item) => ($item['status'] ?? '') === 'admitted'));
+        $search = strtolower(trim((string) $request->query('search')));
+        $course = trim((string) $request->query('course'));
+        $paymentStatus = trim((string) $request->query('payment_status'));
+        $items = array_values(array_filter($items, function (array $item) use ($search, $course, $paymentStatus): bool {
+            $haystack = strtolower(($item['application_no'] ?? '').' '.($item['student_name'] ?? '').' '.($item['guardian_name'] ?? '').' '.($item['phone'] ?? ''));
+            return (! $search || str_contains($haystack, $search))
+                && (! $course || ($item['course_code'] ?? '') === $course)
+                && (! $paymentStatus || ($item['payment_status'] ?? '') === $paymentStatus);
+        }));
+
+        return view('admin.students.index', [
+            'students' => $items,
+            'studentCount' => count($items),
+            'totalPaid' => collect($items)->sum('paid_amount'),
+            'totalBalance' => collect($items)->sum('balance_amount'),
+            'courses' => Course::orderBy('title')->get(['code','title']),
+        ]);
+    }
+
+    public function studentCard(string $id)
+    {
+        $item = AdmissionStore::find($id);
+        abort_unless($item && ($item['status'] ?? '') === 'admitted', 404);
+        $student = $this->withFinancialDefaults([$item])[0];
+
+        return view('admin.students.card', [
+            'student' => $student,
+            'course' => Course::where('code', $student['course_code'] ?? '')->first(),
+            'settings' => SiteSettings::all(),
+        ]);
+    }
+
     public function receipt(string $id)
     {
         $item = AdmissionStore::find($id);

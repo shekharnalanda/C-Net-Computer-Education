@@ -31,6 +31,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');
         Route::put('/profile',[ProfileController::class,'update'])->name('profile.update');
         Route::put('/profile/password',[ProfileController::class,'updatePassword'])->name('profile.password');
+        Route::get('/students',[AdminAdmissionController::class,'students'])->name('students.index');
+        Route::get('/students/{id}/card',[AdminAdmissionController::class,'studentCard'])->name('students.card');
         Route::get('/admissions',[AdminAdmissionController::class,'index'])->name('admissions.index');
         Route::get('/admissions-export',[AdminAdmissionController::class,'export'])->name('admissions.export');
         Route::patch('/admissions/{id}/status',[AdminAdmissionController::class,'updateStatus'])->name('admissions.status');
