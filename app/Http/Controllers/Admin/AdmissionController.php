@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Support\AdmissionStore;
 use App\Support\SiteSettings;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdmissionController extends Controller
@@ -53,6 +54,29 @@ class AdmissionController extends Controller
         abort_unless(AdmissionStore::updatePayment($id, (float) $data['course_fee'], (float) $data['paid_amount'], $data['payment_note'] ?? null), 404);
 
         return back()->with('success', 'Fee record updated successfully.');
+    }
+
+    public function addPayment(Request $request, string $id)
+    {
+        $data = $request->validate([
+            'amount' => ['required','numeric','gt:0','max:99999999.99'],
+            'payment_date' => ['required','date','before_or_equal:today'],
+            'mode' => ['required','in:cash,upi,bank,card,other'],
+            'reference' => ['nullable','string','max:100'],
+            'note' => ['nullable','string','max:255'],
+        ]);
+        $item = AdmissionStore::find($id);
+        abort_unless($item, 404);
+        $item = $this->withFinancialDefaults([$item])[0];
+        if ((float) $data['amount'] > (float) $item['balance_amount']) {
+            throw ValidationException::withMessages(['amount' => 'Payment cannot be greater than the outstanding balance.']);
+        }
+        abort_unless(AdmissionStore::addPaymentTransaction(
+            $id, (float) $data['amount'], $data['payment_date'], $data['mode'],
+            $data['reference'] ?? null, $data['note'] ?? null
+        ), 404);
+
+        return back()->with('success', 'New fee payment recorded successfully.');
     }
 
     public function students(Request $request)
