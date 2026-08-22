@@ -112,4 +112,41 @@ class AdmissionFeeLedgerTest extends TestCase
             ->assertSee('Print / Save PDF');
     }
 
+
+    public function test_admitted_student_appears_in_register_and_card(): void
+    {
+        Course::create([
+            'code' => 'DCA',
+            'title' => 'Diploma in Computer Applications',
+            'duration' => '6 Months',
+            'fee_amount' => 4500,
+            'level' => 'Foundation',
+            'summary' => 'Office skills',
+            'is_active' => true,
+        ]);
+        $student = AdmissionStore::add([
+            'student_name' => 'Admitted Student',
+            'guardian_name' => 'Student Guardian',
+            'phone' => '9876543210',
+            'city' => 'Bihar Sharif',
+            'course_code' => 'DCA',
+            'course_fee' => 4500,
+            'dob' => '2005-01-01',
+            'gender' => 'Male',
+            'qualification' => '12th',
+            'address' => 'Bihar Sharif',
+            'email' => '',
+            'preferred_time' => 'Morning',
+            'message' => '',
+        ]);
+        AdmissionStore::updateStatus($student['id'], 'admitted');
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $this->actingAs($admin)->get(route('admin.students.index'))
+            ->assertOk()->assertSee('Admitted Student')->assertSee('Students Register');
+
+        $this->get(route('admin.students.card', $student['id']))
+            ->assertOk()->assertSee('STUDENT ADMISSION CARD')->assertSee('Admitted Student');
+    }
+
 }
