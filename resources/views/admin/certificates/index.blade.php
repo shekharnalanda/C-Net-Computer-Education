@@ -8,7 +8,7 @@
 <section class="panel certificate-entry"><div class="panel-title"><div><small>ISSUE NEW CERTIFICATE</small><h2>Student certificate</h2></div></div>
 <form method="post" action="{{ route('admin.certificates.store') }}">@csrf
 <div class="form-grid">
-<label>Student<select name="student_id" required><option value="">Select admitted student</option>@foreach($students as $student)<option value="{{ $student['id'] }}" @selected(old('student_id')===$student['id'])>{{ $student['student_name'] }} · {{ $student['course_code'] }} · {{ $student['roll_no'] ?? $student['application_no'] }}</option>@endforeach</select></label>
+<label>Student<select name="student_id" required><option value="">Select admitted student</option>@foreach($students as $student)<option value="{{ $student['id'] }}" @selected(old('student_id',request('student_id'))===$student['id'])>{{ $student['student_name'] }} · {{ $student['course_code'] }} · {{ $student['roll_no'] ?? $student['application_no'] }}</option>@endforeach</select></label>
 <label>Certificate Type<select name="type" required><option value="completion">Course Completion</option><option value="merit">Merit Certificate</option><option value="participation">Participation Certificate</option></select></label>
 <label>Certificate Title<input name="title" value="{{ old('title','Certificate of Course Completion') }}" maxlength="150" required></label>
 <label>Issue Date<input type="date" name="issue_date" value="{{ old('issue_date',now()->toDateString()) }}" max="{{ now()->toDateString() }}" required></label>

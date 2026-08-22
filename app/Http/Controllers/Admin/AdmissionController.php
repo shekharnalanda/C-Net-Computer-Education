@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Support\AdmissionStore;
+use App\Support\CertificateStore;
+use App\Support\ExamResultStore;
 use App\Support\SiteSettings;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -112,8 +114,13 @@ class AdmissionController extends Controller
                 && (! $studentStatus || ($item['student_status'] ?? 'active') === $studentStatus);
         }));
 
+        $latestResults = collect(ExamResultStore::all())->groupBy('student_id')->map->first();
+        $latestCertificates = collect(CertificateStore::all())->groupBy('student_id')->map->first();
+
         return view('admin.students.index', [
             'students' => $items,
+            'latestResults' => $latestResults,
+            'latestCertificates' => $latestCertificates,
             'studentCount' => count($items),
             'totalPaid' => collect($items)->sum('paid_amount'),
             'totalBalance' => collect($items)->sum('balance_amount'),
