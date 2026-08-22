@@ -37,13 +37,16 @@ class AdmissionController extends Controller
             'website' => ['nullable','max:0'],
         ]);
         unset($data['website']);
+        $course = Course::where('code', $data['course_code'])->firstOrFail();
+        $data['course_fee'] = (float) ($course->fee_amount ?? 0);
+        $data['course_fee_note'] = $course->fee_note;
         $data['ip_address'] = $request->ip();
         $application = AdmissionStore::add($data);
 
         try {
             $recipient = SiteSettings::get('email', config('mail.enquiry_to'));
             Mail::raw(
-                "Application: {$application['application_no']}\nStudent: {$application['student_name']}\nGuardian: {$application['guardian_name']}\nPhone: {$application['phone']}\nCourse: {$application['course_code']}\nCity: {$application['city']}\nQualification: {$application['qualification']}",
+                "Application: {$application['application_no']}\nStudent: {$application['student_name']}\nGuardian: {$application['guardian_name']}\nPhone: {$application['phone']}\nCourse: {$application['course_code']}\nCourse Fee: ₹".number_format((float) $application['course_fee'], 2)."\nCity: {$application['city']}\nQualification: {$application['qualification']}",
                 function ($mail) use ($application, $recipient) {
                     $mail->to($recipient)->subject("New Admission Application: {$application['application_no']}");
                     if (! empty($application['email'])) $mail->replyTo($application['email'], $application['student_name']);
