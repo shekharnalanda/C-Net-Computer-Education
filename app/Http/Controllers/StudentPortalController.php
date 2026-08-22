@@ -9,6 +9,7 @@ use App\Support\AssignmentSubmissionStore;
 use App\Support\CertificateStore;
 use App\Support\ExamResultStore;
 use App\Support\LearningResourceStore;
+use App\Support\PracticeTestStore;
 use App\Support\SiteSettings;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
@@ -69,6 +70,8 @@ class StudentPortalController extends Controller
             'attendanceRate' => $attendanceRate,
             'learningResources' => array_values(array_filter(LearningResourceStore::all(), fn (array $row): bool => ($row['is_active'] ?? true) && ($row['course_code'] ?? '') === ($student['course_code'] ?? ''))),
             'assignmentSubmissions' => collect(AssignmentSubmissionStore::forStudent($student['id']))->keyBy('resource_id'),
+            'practiceTests' => array_values(array_filter(PracticeTestStore::all(), fn (array $row): bool => ($row['is_active'] ?? true) && ($row['course_code'] ?? '') === ($student['course_code'] ?? ''))),
+            'practiceAttempts' => collect(PracticeTestStore::attemptsForStudent($student['id']))->groupBy('test_id')->map->first(),
             'results' => array_values(array_filter(ExamResultStore::all(), fn (array $row): bool => ($row['student_id'] ?? '') === $student['id'])),
             'certificates' => array_values(array_filter(CertificateStore::all(), fn (array $row): bool => ($row['student_id'] ?? '') === $student['id'])),
         ]);
@@ -97,6 +100,45 @@ class StudentPortalController extends Controller
             'submission_url' => trim((string) ($data['submission_url'] ?? '')),
         ]);
         return back()->with('success', 'Assignment submitted successfully.');
+    }
+
+    public function practiceTest(Request $request, string $id)
+    {
+        $student=$this->requireStudent($request);
+        $test=PracticeTestStore::find($id);
+        abort_unless($test&&($test['is_active']??true)&&($test['course_code']??'')===($student['course_code']??''),404);
+        return view('student.practice-test',['student'=>$student,'test'=>$test]);
+    }
+
+    public function submitPracticeTest(Request $request, string $id)
+    {
+        $student=$this->requireStudent($request);
+        $test=PracticeTestStore::find($id);
+        abort_unless($test&&($test['is_active']??true)&&($test['course_code']??'')===($student['course_code']??''),404);
+        $data=$request->validate(['answers'=>['nullable','array'],'answers.*'=>['nullable','in:A,B,C,D']]);
+        $answers=(array)($data['answers']??[]); $correct=0; $review=[];
+        foreach($test['questions'] as $question){
+            $selected=$answers[$question['id']]??null; $isCorrect=$selected===($question['correct']??null);
+            if($isCorrect)$correct++;
+            $review[]=['question_id'=>$question['id'],'selected'=>$selected,'correct'=>$question['correct'],'is_correct'=>$isCorrect];
+        }
+        $total=count($test['questions']); $percentage=$total?round(($correct/$total)*100,2):0;
+        $attempt=PracticeTestStore::recordAttempt([
+            'test_id'=>$test['id'],'student_id'=>$student['id'],'course_code'=>$student['course_code'],
+            'correct_answers'=>$correct,'total_questions'=>$total,'percentage'=>$percentage,
+            'status'=>$percentage>=(float)$test['pass_percentage']?'pass':'fail','review'=>$review,
+        ]);
+        return redirect()->route('student.practice.result',$attempt['id']);
+    }
+
+    public function practiceResult(Request $request, string $attemptId)
+    {
+        $student=$this->requireStudent($request);
+        $attempt=collect(PracticeTestStore::attemptsForStudent($student['id']))->firstWhere('id',$attemptId);
+        abort_unless($attempt,404);
+        $test=PracticeTestStore::find($attempt['test_id']);
+        abort_unless($test,404);
+        return view('student.practice-result',['student'=>$student,'test'=>$test,'attempt'=>$attempt]);
     }
 
     public function marksheet(Request $request, string $id)
