@@ -14,6 +14,7 @@ class CertificateVerificationController extends Controller
     {
         $code = strtoupper(trim((string) $request->query('code')));
         $certificate = $code ? CertificateStore::findByCode($code) : null;
+        if($certificate['is_demo']??false) $certificate=null;
         $student = $certificate ? AdmissionStore::find($certificate['student_id']) : null;
 
         return view('certificates.verify', [
