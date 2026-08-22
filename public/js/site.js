@@ -14,6 +14,7 @@ const defaultCourses = [
 ];
 const courses = Array.isArray(window.CNET_COURSES) && window.CNET_COURSES.length ? window.CNET_COURSES : defaultCourses;
 
+function feeLabel(course){return course.fee===null||course.fee===undefined||course.fee===""?"Fee on enquiry":"₹"+Number(course.fee).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})}
 const levels=["All","Foundation","Job-ready","Career","Technical","Creative","Future Skill"];
 const grid=document.getElementById("courseGrid"),filters=document.getElementById("filters"),modal=document.getElementById("courseModal");
 
@@ -23,20 +24,20 @@ function renderFilters(active="All"){
 }
 function renderCourses(level="All"){
   const list=level==="All"?courses:courses.filter(c=>c.level===level);
-  grid.innerHTML=list.map((c,i)=>`<article class="course"><div class="course-top"><span>${String(i+1).padStart(2,"0")}</span><b>${c.level}</b></div><small>${c.code} · ${c.duration}</small><h3>${c.title}</h3><h4>${c.hi}</h4><p>${c.summary}</p><button class="course-link" data-code="${c.code}">View course details <span>↗</span></button></article>`).join("");
+  grid.innerHTML=list.map((c,i)=>`<article class="course"><div class="course-top"><span>${String(i+1).padStart(2,"0")}</span><b>${c.level}</b></div><small>${c.code} · ${c.duration}</small><div class="course-fee">${feeLabel(c)}</div><h3>${c.title}</h3><h4>${c.hi}</h4><p>${c.summary}</p><button class="course-link" data-code="${c.code}">View course details <span>↗</span></button></article>`).join("");
   grid.querySelectorAll(".course-link").forEach(b=>b.addEventListener("click",()=>openCourse(b.dataset.code)));
 }
 function openCourse(code){
   const c=courses.find(x=>x.code===code); if(!c)return;
   document.getElementById("modalHead").innerHTML=`<span>${c.level} · ${c.code}</span><h2 id="courseTitle">${c.title}</h2><h3>${c.hi}</h3><p>Practical, career-focused training with guided lab work and useful assignments.</p><p class="modal-hi">व्यावहारिक लैब प्रशिक्षण, assignments और career guidance के साथ सीखें।</p>`;
-  document.getElementById("courseFacts").innerHTML=`<div><small>Duration · अवधि</small><b>${c.duration}</b></div><div><small>Eligibility · योग्यता</small><b>${c.eligibility}</b></div><div><small>Training mode</small><b>Practical lab + projects</b></div>`;
+  document.getElementById("courseFacts").innerHTML=`<div><small>Duration · अवधि</small><b>${c.duration}</b></div><div><small>Eligibility · योग्यता</small><b>${c.eligibility}</b></div><div><small>Course Fee · शुल्क</small><b>${feeLabel(c)}${c.fee_note?`<small class="fee-note">${c.fee_note}</small>`:""}</b></div>`;
   document.getElementById("detailColumns").innerHTML=`<div><h4>What you will learn · क्या सीखेंगे</h4><ul>${c.modules.map(x=>`<li>✓ <span>${x}</span></li>`).join("")}</ul></div><div><h4>Career opportunities · रोजगार</h4><ul>${c.careers.map(x=>`<li>→ <span>${x}</span></li>`).join("")}</ul><div class="detail-note"><b>Certificate & assessment</b><p>Course completion assessment and certificate support included.</p></div></div>`;
   document.getElementById("courseSelect").value=c.code; modal.hidden=false; document.body.style.overflow="hidden"; document.getElementById("modalClose").focus();
 }
 function closeModal(){modal.hidden=true;document.body.style.overflow=""}
 document.getElementById("modalClose").addEventListener("click",closeModal);document.getElementById("modalBack").addEventListener("click",closeModal);document.getElementById("modalEnquire").addEventListener("click",closeModal);modal.addEventListener("click",e=>{if(e.target===modal)closeModal()});document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
 
-const courseSelect=document.getElementById("courseSelect");courses.forEach(c=>courseSelect.add(new Option(`${c.code} — ${c.title}`,c.code)));
+const courseSelect=document.getElementById("courseSelect");courses.forEach(c=>courseSelect.add(new Option(`${c.code} — ${c.title} — ${feeLabel(c)}`,c.code)));
 function updateJobs(){const role=encodeURIComponent(document.getElementById("jobRole").value||"Computer Operator"),loc=encodeURIComponent(document.getElementById("jobLocation").value||"Bihar");document.getElementById("linkedinSearch").href=`https://www.linkedin.com/jobs/search/?keywords=${role}&location=${loc}`;document.getElementById("indeedSearch").href=`https://in.indeed.com/jobs?q=${role}&l=${loc}`}
 document.getElementById("jobRole").addEventListener("input",updateJobs);document.getElementById("jobLocation").addEventListener("input",updateJobs);
 
