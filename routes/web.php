@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\AdmissionController as AdminAdmissionController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -31,6 +32,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');
         Route::put('/profile',[ProfileController::class,'update'])->name('profile.update');
         Route::put('/profile/password',[ProfileController::class,'updatePassword'])->name('profile.password');
+        Route::get('/attendance',[AttendanceController::class,'index'])->name('attendance.index');
+        Route::post('/attendance',[AttendanceController::class,'store'])->name('attendance.store');
+        Route::get('/attendance-export',[AttendanceController::class,'export'])->name('attendance.export');
         Route::get('/students',[AdminAdmissionController::class,'students'])->name('students.index');
         Route::get('/students/{id}/card',[AdminAdmissionController::class,'studentCard'])->name('students.card');
         Route::patch('/students/{id}',[AdminAdmissionController::class,'updateStudent'])->name('students.update');
