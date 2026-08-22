@@ -35,6 +35,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/attendance',[AttendanceController::class,'index'])->name('attendance.index');
         Route::post('/attendance',[AttendanceController::class,'store'])->name('attendance.store');
         Route::get('/attendance-export',[AttendanceController::class,'export'])->name('attendance.export');
+        Route::get('/attendance-report',[AttendanceController::class,'monthly'])->name('attendance.report');
+        Route::get('/attendance-report-export',[AttendanceController::class,'monthlyExport'])->name('attendance.report.export');
         Route::get('/students',[AdminAdmissionController::class,'students'])->name('students.index');
         Route::get('/students/{id}/card',[AdminAdmissionController::class,'studentCard'])->name('students.card');
         Route::patch('/students/{id}',[AdminAdmissionController::class,'updateStudent'])->name('students.update');
