@@ -37,7 +37,7 @@
             <button class="soft-btn">Save Fee Record</button>
         </form>
     </div>
-    <div class="application-contact"><a href="tel:{{ preg_replace('/\s+/', '', $application['phone']) }}">Call</a><a class="whatsapp" href="https://wa.me/{{ preg_replace('/\D+/', '', $application['phone']) }}" target="_blank">WhatsApp</a></div>
+    <div class="application-contact"><a href="tel:{{ preg_replace('/\s+/', '', $application['phone']) }}">Call</a><a class="whatsapp" href="https://wa.me/{{ preg_replace('/\D+/', '', $application['phone']) }}" target="_blank">WhatsApp</a><a class="receipt-link" href="{{ route('admin.admissions.receipt',$application['id']) }}" target="_blank">Print Receipt</a></div>
     <div class="application-actions">
         <form method="post" action="{{ route('admin.admissions.status',$application['id']) }}">@csrf @method('PATCH')<select name="status" class="status-select status-{{ $application['status'] }}" onchange="this.form.submit()">@foreach(['pending','contacted','verified','admitted','rejected'] as $status)<option value="{{ $status }}" @selected($application['status']===$status)>{{ ucfirst($status) }}</option>@endforeach</select></form>
         <form method="post" action="{{ route('admin.admissions.destroy',$application['id']) }}" onsubmit="return confirm('Delete this application permanently?')">@csrf @method('DELETE')<button class="soft-btn danger">Delete</button></form>
