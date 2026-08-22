@@ -33,6 +33,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('/profile/password',[ProfileController::class,'updatePassword'])->name('profile.password');
         Route::get('/students',[AdminAdmissionController::class,'students'])->name('students.index');
         Route::get('/students/{id}/card',[AdminAdmissionController::class,'studentCard'])->name('students.card');
+        Route::patch('/students/{id}',[AdminAdmissionController::class,'updateStudent'])->name('students.update');
         Route::get('/admissions',[AdminAdmissionController::class,'index'])->name('admissions.index');
         Route::get('/admissions-export',[AdminAdmissionController::class,'export'])->name('admissions.export');
         Route::patch('/admissions/{id}/status',[AdminAdmissionController::class,'updateStatus'])->name('admissions.status');
