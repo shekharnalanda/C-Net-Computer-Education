@@ -73,4 +73,43 @@ class AdmissionFeeLedgerTest extends TestCase
         $this->assertSame('partial', $updated['payment_status']);
         $this->assertNotEmpty($updated['receipt_no']);
     }
+
+    public function test_admin_can_open_a_printable_fee_receipt(): void
+    {
+        Course::create([
+            'code' => 'DCA',
+            'title' => 'Diploma in Computer Applications',
+            'duration' => '6 Months',
+            'fee_amount' => 4500,
+            'level' => 'Foundation',
+            'summary' => 'Office skills',
+            'is_active' => true,
+        ]);
+        $application = AdmissionStore::add([
+            'student_name' => 'Receipt Student',
+            'guardian_name' => 'Receipt Guardian',
+            'phone' => '9876543210',
+            'city' => 'Bihar Sharif',
+            'course_code' => 'DCA',
+            'course_fee' => 4500,
+            'dob' => '2005-01-01',
+            'gender' => 'Male',
+            'qualification' => '12th',
+            'address' => 'Bihar Sharif',
+            'email' => '',
+            'preferred_time' => 'Morning',
+            'message' => '',
+        ]);
+        AdmissionStore::updatePayment($application['id'], 4500, 2000, 'Cash first instalment');
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $this->actingAs($admin)
+            ->get(route('admin.admissions.receipt', $application['id']))
+            ->assertOk()
+            ->assertSee('FEE RECEIPT')
+            ->assertSee('Receipt Student')
+            ->assertSee('2,000.00')
+            ->assertSee('Print / Save PDF');
+    }
+
 }
