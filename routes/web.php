@@ -43,6 +43,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/admissions',[AdminAdmissionController::class,'index'])->name('admissions.index');
         Route::get('/fee-dues',[AdminAdmissionController::class,'feeDues'])->name('fees.dues');
         Route::get('/fee-dues-export',[AdminAdmissionController::class,'feeDuesExport'])->name('fees.dues.export');
+        Route::get('/fee-collections',[AdminAdmissionController::class,'feeCollections'])->name('fees.collections');
+        Route::get('/fee-collections-export',[AdminAdmissionController::class,'feeCollectionsExport'])->name('fees.collections.export');
         Route::get('/admissions-export',[AdminAdmissionController::class,'export'])->name('admissions.export');
         Route::patch('/admissions/{id}/status',[AdminAdmissionController::class,'updateStatus'])->name('admissions.status');
         Route::patch('/admissions/{id}/payment',[AdminAdmissionController::class,'updatePayment'])->name('admissions.payment');
