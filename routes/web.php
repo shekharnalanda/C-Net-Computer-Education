@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\AdmissionController as AdminAdmissionController;
 use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\CertificateController as AdminCertificateController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EnquiryController as AdminEnquiryController;
 use App\Http\Controllers\Admin\GalleryController;
@@ -13,12 +14,14 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ResultController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\AdmissionController;
+use App\Http\Controllers\CertificateVerificationController;
 use App\Http\Controllers\EnquiryController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class,'index'])->name('home');
 Route::post('/enquiry', [EnquiryController::class,'store'])->middleware('throttle:10,1')->name('enquiry.store');
+Route::get('/certificate/verify', [CertificateVerificationController::class,'index'])->name('certificates.verify');
 Route::get('/apply-online', [AdmissionController::class,'create'])->name('admission.create');
 Route::post('/apply-online', [AdmissionController::class,'store'])->middleware('throttle:5,1')->name('admission.store');
 
@@ -33,6 +36,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');
         Route::put('/profile',[ProfileController::class,'update'])->name('profile.update');
         Route::put('/profile/password',[ProfileController::class,'updatePassword'])->name('profile.password');
+        Route::get('/certificates',[AdminCertificateController::class,'index'])->name('certificates.index');
+        Route::post('/certificates',[AdminCertificateController::class,'store'])->name('certificates.store');
+        Route::get('/certificates/{id}/print',[AdminCertificateController::class,'print'])->name('certificates.print');
+        Route::delete('/certificates/{id}',[AdminCertificateController::class,'destroy'])->name('certificates.destroy');
         Route::get('/results',[ResultController::class,'index'])->name('results.index');
         Route::post('/results',[ResultController::class,'store'])->name('results.store');
         Route::get('/results/{id}/marksheet',[ResultController::class,'marksheet'])->name('results.marksheet');
