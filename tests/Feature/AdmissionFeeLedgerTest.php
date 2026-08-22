@@ -287,4 +287,44 @@ class AdmissionFeeLedgerTest extends TestCase
         $this->assertStringNotContainsString('Paid Student', $export->streamedContent());
     }
 
+
+    public function test_admin_can_filter_and_export_fee_collection_transactions(): void
+    {
+        Course::create([
+            'code' => 'DCA', 'title' => 'Diploma in Computer Applications',
+            'duration' => '6 Months', 'fee_amount' => 6000,
+            'level' => 'Foundation', 'summary' => 'Office skills', 'is_active' => true,
+        ]);
+        $student = AdmissionStore::add([
+            'student_name' => 'Collection Student', 'guardian_name' => 'Guardian',
+            'phone' => '9876543210', 'city' => 'Bihar Sharif', 'course_code' => 'DCA',
+            'course_fee' => 6000, 'dob' => '2005-01-01', 'gender' => 'Male',
+            'qualification' => '12th', 'address' => 'Bihar Sharif', 'email' => '',
+            'preferred_time' => 'Morning', 'message' => '',
+        ]);
+        AdmissionStore::addPaymentTransaction($student['id'], 1200, now()->subDay()->toDateString(), 'cash', 'CASH-01', 'Cash installment');
+        AdmissionStore::addPaymentTransaction($student['id'], 1800, now()->toDateString(), 'upi', 'UPI-REPORT-01', 'UPI installment');
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $params = [
+            'from' => now()->subDay()->toDateString(),
+            'to' => now()->toDateString(),
+            'course' => 'DCA',
+            'mode' => 'upi',
+        ];
+        $this->actingAs($admin)->get(route('admin.fees.collections', $params))
+            ->assertOk()
+            ->assertSee('Fee Collection Report')
+            ->assertSee('Collection Student')
+            ->assertSee('UPI-REPORT-01')
+            ->assertSee('1,800.00')
+            ->assertDontSee('CASH-01');
+
+        $export = $this->get(route('admin.fees.collections.export', $params))
+            ->assertOk()
+            ->assertHeader('content-type', 'text/csv; charset=UTF-8');
+        $this->assertStringContainsString('UPI-REPORT-01', $export->streamedContent());
+        $this->assertStringNotContainsString('CASH-01', $export->streamedContent());
+    }
+
 }
