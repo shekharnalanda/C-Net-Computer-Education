@@ -1,0 +1,49 @@
+/* Grouped, high-contrast admin navigation. */
+.sidebar {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.admin-nav { align-content: start; }
+
+.nav-group {
+    border: 1px solid #ffffff18;
+    border-radius: 10px;
+    background: #ffffff08;
+}
+
+.nav-group summary {
+    position: relative;
+    padding: 13px 34px 13px 14px;
+    color: #e7f0f7;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+    border-radius: 9px;
+}
+
+.nav-group summary::-webkit-details-marker { display: none; }
+.nav-group summary::after {
+    content: '›';
+    position: absolute;
+    right: 14px;
+    top: 10px;
+    font-size: 22px;
+    transition: transform .2s;
+}
+
+.nav-group[open] summary::after { transform: rotate(90deg); }
+.nav-group[open] summary { background: #ffffff0d; }
+.nav-group-links { display: grid; gap: 4px; padding: 5px 6px 7px; }
+.sidebar nav .nav-group-links a { padding: 11px 10px 11px 20px; font-size: 14px; }
+.nav-group:has(a.active) { border-color: #1769ff88; background: #1769ff0d; }
+
+@media (max-width: 800px) {
+    .sidebar nav.admin-nav { grid-template-columns: 1fr 1fr; align-items: start; }
+    .nav-group-links { display: grid; }
+    .sidebar { max-height: none; overflow: visible; }
+}
+
+@media (max-width: 520px) {
+    .sidebar nav.admin-nav { grid-template-columns: 1fr; }
+}
