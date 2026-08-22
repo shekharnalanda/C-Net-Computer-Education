@@ -17,11 +17,18 @@ use App\Http\Controllers\AdmissionController;
 use App\Http\Controllers\CertificateVerificationController;
 use App\Http\Controllers\EnquiryController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\StudentPortalController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class,'index'])->name('home');
 Route::post('/enquiry', [EnquiryController::class,'store'])->middleware('throttle:10,1')->name('enquiry.store');
 Route::get('/certificate/verify', [CertificateVerificationController::class,'index'])->name('certificates.verify');
+Route::get('/student/login', [StudentPortalController::class,'showLogin'])->name('student.login');
+Route::post('/student/login', [StudentPortalController::class,'login'])->middleware('throttle:5,1')->name('student.login.submit');
+Route::get('/student', [StudentPortalController::class,'dashboard'])->name('student.dashboard');
+Route::post('/student/logout', [StudentPortalController::class,'logout'])->name('student.logout');
+Route::get('/student/results/{id}/marksheet', [StudentPortalController::class,'marksheet'])->name('student.results.marksheet');
+Route::get('/student/certificates/{id}/print', [StudentPortalController::class,'certificate'])->name('student.certificates.print');
 Route::get('/apply-online', [AdmissionController::class,'create'])->name('admission.create');
 Route::post('/apply-online', [AdmissionController::class,'store'])->middleware('throttle:5,1')->name('admission.store');
 
