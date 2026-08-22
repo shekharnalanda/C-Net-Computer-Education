@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\NoticeController;
 use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\LearningResourceController;
+use App\Http\Controllers\Admin\PracticeTestController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ResultController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -30,6 +31,9 @@ Route::post('/student/login', [StudentPortalController::class,'login'])->middlew
 Route::get('/student', [StudentPortalController::class,'dashboard'])->name('student.dashboard');
 Route::post('/student/logout', [StudentPortalController::class,'logout'])->name('student.logout');
 Route::post('/student/assignments', [StudentPortalController::class,'submitAssignment'])->middleware('throttle:10,1')->name('student.assignments.submit');
+Route::get('/student/practice-tests/{id}', [StudentPortalController::class,'practiceTest'])->name('student.practice.take');
+Route::post('/student/practice-tests/{id}', [StudentPortalController::class,'submitPracticeTest'])->middleware('throttle:10,1')->name('student.practice.submit');
+Route::get('/student/practice-results/{attemptId}', [StudentPortalController::class,'practiceResult'])->name('student.practice.result');
 Route::get('/student/results/{id}/marksheet', [StudentPortalController::class,'marksheet'])->name('student.results.marksheet');
 Route::get('/student/certificates/{id}/print', [StudentPortalController::class,'certificate'])->name('student.certificates.print');
 Route::get('/apply-online', [AdmissionController::class,'create'])->name('admission.create');
@@ -50,6 +54,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/certificates',[AdminCertificateController::class,'store'])->name('certificates.store');
         Route::get('/certificates/{id}/print',[AdminCertificateController::class,'print'])->name('certificates.print');
         Route::delete('/certificates/{id}',[AdminCertificateController::class,'destroy'])->name('certificates.destroy');
+        Route::get('/practice-tests',[PracticeTestController::class,'index'])->name('practice.index');
+        Route::post('/practice-tests',[PracticeTestController::class,'store'])->name('practice.store');
+        Route::patch('/practice-tests/{id}/toggle',[PracticeTestController::class,'toggle'])->name('practice.toggle');
+        Route::delete('/practice-tests/{id}',[PracticeTestController::class,'destroy'])->name('practice.destroy');
         Route::get('/assignments',[AssignmentSubmissionController::class,'index'])->name('assignments.index');
         Route::patch('/assignments/{id}/review',[AssignmentSubmissionController::class,'review'])->name('assignments.review');
         Route::delete('/assignments/{id}',[AssignmentSubmissionController::class,'destroy'])->name('assignments.destroy');
