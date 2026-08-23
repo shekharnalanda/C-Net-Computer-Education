@@ -26,6 +26,14 @@ class ProductionAuditService
 
         $add('Application','Composer vendor',is_file(base_path('vendor/autoload.php'))?'pass':'fail',is_file(base_path('vendor/autoload.php'))?'Present':'Missing');
         $add('Application','Environment file',is_readable(base_path('.env'))?'pass':'fail',is_readable(base_path('.env'))?'Readable':'Missing or unreadable');
+        $heroImage=public_path('images/hero-computer-lab.webp');
+        $siteCss=public_path('css/site.css');
+        $homeView=resource_path('views/home.blade.php');
+        $css=is_readable($siteCss)?(string)file_get_contents($siteCss):'';
+        $view=is_readable($homeView)?(string)file_get_contents($homeView):'';
+        $add('Homepage','Hero image',is_file($heroImage)&&filesize($heroImage)>10000?'pass':'fail',is_file($heroImage)?'Present ('.number_format((int)filesize($heroImage)).' bytes)':'Missing');
+        $add('Homepage','MCI-style full-width hero',str_contains($css,'C-Net full-width hero')&&str_contains($css,'.hero-media{display:none!important}')?'pass':'fail','Full-width responsive hero CSS');
+        $add('Homepage','Automatic CSS refresh',str_contains($view,"filemtime(public_path('css/site.css'))")?'pass':'fail','Cache-busting stylesheet version');
         foreach(['storage/app','storage/framework/cache','storage/framework/sessions','storage/framework/views','storage/logs','bootstrap/cache'] as $dir)
             $add('Permissions',$dir,is_dir(base_path($dir))&&is_writable(base_path($dir))?'pass':'fail',is_dir(base_path($dir))&&is_writable(base_path($dir))?'Writable':'Not writable');
 
