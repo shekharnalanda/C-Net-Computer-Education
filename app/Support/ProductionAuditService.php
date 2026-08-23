@@ -48,7 +48,7 @@ class ProductionAuditService
         foreach($requiredRoutes as $route)$add('Routes',$route,Route::has($route)?'pass':'fail',Route::has($route)?'Registered':'Missing');
 
         $from=(string)config('mail.from.address');
-        $add('Communication','Sender email',filter_var($from,FILTER_VALIDATE_EMAIL)?'pass':'warn',$from?:'Not configured');
+        $add('Communication','Sender email',$from==='cnetbiharsharif@gmail.com'?'pass':'fail',$from?:'Not configured');
         $add('Security','Security middleware',class_exists(\App\Http\Middleware\SecurityHeaders::class)?'pass':'fail','HTTP security headers enabled');
         $add('Security','Public directory hardening',is_file(public_path('.htaccess'))?'pass':'fail',is_file(public_path('.htaccess'))?'Apache rules present':'Missing .htaccess');
         $add('Recovery','Backup service',class_exists(DataBackupService::class)?'pass':'fail','Signed backup and restore available');
