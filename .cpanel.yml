@@ -8,3 +8,4 @@ deployment:
     - /opt/cpanel/ea-php83/root/usr/bin/php /home4/mcied45x/repositories/C-Net-Computer-Education/artisan view:cache
     - /opt/cpanel/ea-php83/root/usr/bin/php /home4/mcied45x/repositories/C-Net-Computer-Education/artisan route:cache
     - /opt/cpanel/ea-php83/root/usr/bin/php /home4/mcied45x/repositories/C-Net-Computer-Education/artisan route:list
+    - /opt/cpanel/ea-php83/root/usr/bin/php /home4/mcied45x/repositories/C-Net-Computer-Education/artisan cnet:audit --no-interaction
