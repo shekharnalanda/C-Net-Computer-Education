@@ -24,6 +24,18 @@ class ProductionAuditTest extends TestCase
         $this->assertGreaterThanOrEqual(25,$audit['passed']);
     }
 
+    public function test_automatic_production_audit_command_passes(): void
+    {
+        User::factory()->create(['is_admin'=>true]);
+        config([
+            'app.env'=>'production','app.debug'=>false,'app.url'=>'https://cnetcomputer.mciedu.com',
+            'app.timezone'=>'Asia/Kolkata','mail.from.address'=>'cnetbiharsharif@gmail.com',
+        ]);
+        $this->artisan('cnet:audit')
+            ->expectsOutputToContain('AUTOMATIC AUDIT PASSED')
+            ->assertExitCode(0);
+    }
+
     public function test_production_audit_is_admin_only_and_json_is_private(): void
     {
         $admin=User::factory()->create(['is_admin'=>true]);
