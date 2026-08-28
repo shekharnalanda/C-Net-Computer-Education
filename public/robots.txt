@@ -1,4 +1,7 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin/
+Disallow: /student/
+Disallow: /login
 
 Sitemap: https://cnetcomputer.mciedu.com/sitemap.xml
