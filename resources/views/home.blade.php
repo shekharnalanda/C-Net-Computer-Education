@@ -9,7 +9,27 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C-Net Computer Education">
 <meta name="twitter:description" content="C-Net Computer Education — practical bilingual computer courses, skill development and career support in Bihar Sharif, Nalanda.">
-<meta name="twitter:image" content="https://cnetcomputer.mciedu.com/images/cnet-logo.webp"><link rel="stylesheet" href="{{ asset('css/site.css') }}?v={{ filemtime(public_path('css/site.css')) }}"></head><body><main>
+<meta name="twitter:image" content="https://cnetcomputer.mciedu.com/images/cnet-logo.webp"><link rel="stylesheet" href="{{ asset('css/site.css') }}?v={{ filemtime(public_path('css/site.css')) }}">@verbatim
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "C-Net Computer Education",
+  "url": "https://cnetcomputer.mciedu.com/",
+  "logo": "https://cnetcomputer.mciedu.com/images/cnet-logo.webp",
+  "description": "C-Net Computer Education offers practical bilingual computer courses, skill development and career support in Bihar Sharif, Nalanda.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Bihar Sharif",
+    "addressRegion": "Bihar",
+    "postalCode": "803101",
+    "addressCountry": "IN"
+  }
+}
+</script>
+@endverbatim
+
+</head><body><main>
 <header class="site-header"><a class="brand" href="#home"><img class="brand-logo" src="{{ asset('images/cnet-logo.webp') }}" alt="C-Net logo"><span><strong>C-Net</strong><small>Computer Education</small></span></a><button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-expanded="false" aria-controls="siteNavigation" aria-label="Open navigation"><span></span><span></span><span></span></button><nav id="siteNavigation"><a href="#home">Home</a><a href="#courses">Courses</a><a href="{{ route('admission.create') }}">Admission</a><a href="#notices">Notices</a><a href="#gallery">Gallery</a><a href="#why">Why C-Net</a><a href="#jobs">Job Search</a><a href="{{ route('certificates.verify') }}">Verify Certificate</a><a href="{{ route('student.login') }}">Student Login</a><a href="#enquiry">Enquiry</a><a href="#contact">Contact</a><a class="admin-nav-link" href="{{ route('admin.login') }}">Admin Login</a></nav><a class="pill" href="{{ route('admission.create') }}">Apply Online ↗</a></header>
 <section class="hero" id="home"><div class="hero-copy"><div class="eyebrow">● {{ $settings['admission_notice'] }}</div><h1>{{ $settings['hero_title'] }}<br><em>{{ $settings['hero_highlight'] }}</em></h1><p>{{ $settings['hero_text_en'] }}</p><p class="hi">{{ $settings['hero_text_hi'] }}</p><div class="actions"><a class="primary" href="#courses">Explore Courses →</a><a class="secondary" href="#jobs">⌕ Find Jobs</a></div><div class="proof"><div><strong>{{ $courses->count() }}+</strong><span>Career Courses</span></div><div><strong>{{ $settings['highlight_two_value'] }}</strong><span>{{ $settings['highlight_two_label'] }}</span></div><div><strong>{{ $settings['highlight_three_value'] }}</strong><span>{{ $settings['highlight_three_label'] }}</span></div></div></div><div class="hero-media"><img src="{{ asset('images/hero-computer-lab.webp') }}" alt="Students learning in a computer lab"><div class="float top">● <span><b>Practical First</b><small>Learn by doing</small></span></div><div class="float bottom">⌁ <span><b>Career Support</b><small>Skills to opportunities</small></span></div></div></section>
 <div class="trust"><span>MS Office</span><i>✦</i><span>Tally Prime</span><i>✦</i><span>Graphic Design</span><i>✦</i><span>Web Development</span><i>✦</i><span>Python</span><i>✦</i><span>AI Tools</span></div>
