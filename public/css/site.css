@@ -62,3 +62,8 @@
 .hero-copy>p{max-width:590px}
 @media(max-width:1100px){.hero{display:block;min-height:560px;padding:50px 6vw;background:linear-gradient(90deg,#f7fbff 0%,#f7fbffee 46%,#f7fbff5c 72%),url('../images/hero-computer-lab.webp') 68% 46%/cover no-repeat}.hero-copy{max-width:58%}.hero h1{font-size:clamp(42px,6vw,66px)}}
 @media(max-width:760px){html,body{max-width:100%;overflow-x:hidden}.hero{min-height:720px;padding:50px 22px 360px;background:linear-gradient(180deg,#f7fbff 0%,#f7fbfff2 49%,transparent 70%),url('../images/hero-computer-lab.webp') 70% bottom/auto 390px no-repeat #e5f7fb}.hero-copy{max-width:100%}.hero h1{font-size:clamp(40px,12vw,58px)}.proof{gap:18px}.proof strong{font-size:22px}}
+
+/* Compact homepage career and admission areas */
+.section.jobs{padding-top:58px;padding-bottom:58px}
+.admission-promo{margin-bottom:42px;padding-top:30px;padding-bottom:30px}
+@media(max-width:760px){.section.jobs{padding-top:48px;padding-bottom:48px}.admission-promo{margin-bottom:36px;padding-top:24px;padding-bottom:24px}}
