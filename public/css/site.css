@@ -52,10 +52,10 @@
 
 
 /* C-Net full-width hero — aligned with the proven MCI homepage treatment */
-.hero{display:block;min-height:650px;position:relative;padding:96px clamp(28px,7vw,110px);background:linear-gradient(90deg,#f7fbff 0%,#f7fbfff5 34%,#f7fbff78 54%,transparent 74%),url('../images/hero-computer-lab.webp') right center/cover no-repeat;overflow:hidden}
+.hero{display:block;min-height:560px;position:relative;padding:44px clamp(28px,7vw,110px);background:linear-gradient(90deg,#f7fbff 0%,#f7fbfff5 34%,#f7fbff78 54%,transparent 74%),url('../images/hero-computer-lab.webp') right 46%/cover no-repeat;overflow:hidden}
 .hero-copy{max-width:650px;position:relative;z-index:2}
 .hero-media{display:none!important}
 .hero h1{max-width:650px}
 .hero-copy>p{max-width:590px}
-@media(max-width:1100px){.hero{display:block;min-height:610px;padding:78px 6vw;background:linear-gradient(90deg,#f7fbff 0%,#f7fbffee 46%,#f7fbff5c 72%),url('../images/hero-computer-lab.webp') 68% center/cover no-repeat}.hero-copy{max-width:58%}.hero h1{font-size:clamp(42px,6vw,66px)}}
+@media(max-width:1100px){.hero{display:block;min-height:560px;padding:50px 6vw;background:linear-gradient(90deg,#f7fbff 0%,#f7fbffee 46%,#f7fbff5c 72%),url('../images/hero-computer-lab.webp') 68% 46%/cover no-repeat}.hero-copy{max-width:58%}.hero h1{font-size:clamp(42px,6vw,66px)}}
 @media(max-width:760px){html,body{max-width:100%;overflow-x:hidden}.hero{min-height:720px;padding:50px 22px 360px;background:linear-gradient(180deg,#f7fbff 0%,#f7fbfff2 49%,transparent 70%),url('../images/hero-computer-lab.webp') 70% bottom/auto 390px no-repeat #e5f7fb}.hero-copy{max-width:100%}.hero h1{font-size:clamp(40px,12vw,58px)}.proof{gap:18px}.proof strong{font-size:22px}}
