@@ -71,3 +71,7 @@
 /* C-Net distinct career presentation */
 .section.jobs .job-intro>img{height:170px;object-position:center 46%}
 @media(max-width:760px){.section.jobs .job-intro>img{height:160px}}
+
+/* Balanced career heading scale */
+.section.jobs .job-intro h2{font-size:clamp(36px,3.7vw,54px);line-height:1.03;letter-spacing:-2.2px}
+@media(max-width:760px){.section.jobs .job-intro h2{font-size:clamp(34px,9vw,46px);letter-spacing:-1.5px}}
