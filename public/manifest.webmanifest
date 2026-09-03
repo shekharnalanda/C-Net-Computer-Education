@@ -1,0 +1,25 @@
+{
+  "name": "C-Net Computer Education",
+  "short_name": "C-Net",
+  "description": "Computer courses, student services and career support from C-Net Computer Education.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f6f1",
+  "theme_color": "#07172d",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

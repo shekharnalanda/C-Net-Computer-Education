@@ -83,3 +83,13 @@
 .section.lab .features{margin-top:28px;margin-bottom:0}
 .section.lab .features li{padding-top:14px;padding-bottom:14px}
 @media(max-width:760px){.section.lab{padding-top:48px;padding-bottom:48px}.section.lab .lab-photo img{height:380px}.section.lab h2{font-size:clamp(34px,9vw,46px);letter-spacing:-1.6px}}
+
+/* Footer application and secure admin actions */
+footer{grid-template-columns:1fr auto auto}
+.footer-actions{display:flex;gap:10px;align-items:center;justify-content:flex-end}
+.footer-actions button,.footer-actions a{border:1px solid #ffffff2e;border-radius:999px;padding:12px 17px;color:#fff;background:#ffffff10;text-decoration:none;font-size:12px;font-weight:900;cursor:pointer}
+.footer-actions button{background:var(--blue);border-color:var(--blue)}
+.footer-actions button:hover,.footer-actions a:hover{background:#fff;color:var(--ink)}
+.footer-actions button:disabled{opacity:.7;cursor:default}
+@media(max-width:900px){footer{grid-template-columns:1fr}.footer-actions{justify-content:flex-start}.footer-links{grid-row:auto}footer>small{grid-column:1}}
+@media(max-width:480px){.footer-actions{align-items:stretch;flex-direction:column}.footer-actions button,.footer-actions a{text-align:center}}
