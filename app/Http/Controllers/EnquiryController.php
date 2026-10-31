@@ -14,7 +14,7 @@ class EnquiryController extends Controller
         $data = $request->validate([
             'name' => ['required','string','max:80'],
             'phone' => ['required','string','max:20','regex:/^[0-9+ -]{10,15}$/'],
-            'email' => ['required', 'email,'max:120'],
+            'email' => ['required', 'email','max:120'],
             'city' => ['nullable','string','max:80'],
             'course' => ['required','string','max:40'],
             'message' => ['nullable','string','max:1000'],
