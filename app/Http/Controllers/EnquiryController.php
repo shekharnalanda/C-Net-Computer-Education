@@ -45,6 +45,14 @@ $enquiry = Enquiry::create([
             report($e);
         }
 
+        try {
+            Mail::raw('Thank you for contacting C-Net Computer Education. We have received your enquiry and our team will contact you soon.', function ($mail) use ($enquiry) {
+                $mail->to($enquiry->email)->subject('C-Net Computer Education - Enquiry Received');
+            });
+        } catch (\\Throwable $exception) {
+            report($exception);
+        }
+
         return response()->json(['success'=>true,'message'=>'धन्यवाद! आपकी enquiry सुरक्षित हो गई है। हमारी टीम जल्द संपर्क करेगी।']);
     }
 }
