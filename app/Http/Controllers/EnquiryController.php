@@ -49,7 +49,7 @@ $enquiry = Enquiry::create([
             Mail::raw('Thank you for contacting C-Net Computer Education. We have received your enquiry and our team will contact you soon.', function ($mail) use ($enquiry) {
                 $mail->to($enquiry->email)->subject('C-Net Computer Education - Enquiry Received');
             });
-        } catch (\\Throwable $exception) {
+        } catch (\Throwable $exception) {
             report($exception);
         }
 
