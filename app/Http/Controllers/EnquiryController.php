@@ -14,14 +14,22 @@ class EnquiryController extends Controller
         $data = $request->validate([
             'name' => ['required','string','max:80'],
             'phone' => ['required','string','max:20','regex:/^[0-9+ -]{10,15}$/'],
-            'email' => ['nullable','email','max:120'],
+            'email' => ['required', 'email,'max:120'],
             'city' => ['nullable','string','max:80'],
             'course' => ['required','string','max:40'],
             'message' => ['nullable','string','max:1000'],
             'website' => ['nullable','max:0'],
         ]);
 
-        $enquiry = Enquiry::create([
+        
+        $verified = $request->session()->get('enquiry_email_verified');
+        $email = strtolower(trim((string) ($data['email'] ?? '')));
+        if (!$verified || !hash_equals((string) ($verified['email'] ?? ''), $email) || now()->timestamp > (int) ($verified['expires_at'] ?? 0)) {
+            return back()->withInput()->withErrors(['email' => 'पहले इस email पर भेजा गया OTP verify करें।']);
+        }
+        $request->session()->forget('enquiry_email_verified');
+
+$enquiry = Enquiry::create([
             'name'=>$data['name'],'phone'=>$data['phone'],'email'=>$data['email'] ?? null,
             'city'=>$data['city'] ?? null,'course_code'=>$data['course'],
             'message'=>$data['message'] ?? null,'ip_address'=>$request->ip(),
