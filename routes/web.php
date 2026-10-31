@@ -24,11 +24,14 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\AdmissionController;
 use App\Http\Controllers\CertificateVerificationController;
 use App\Http\Controllers\EnquiryController;
+use App\Http\Controllers\EnquiryEmailOtpController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\StudentPortalController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class,'index'])->name('home');
+Route::post('/enquiry/email-otp', [EnquiryEmailOtpController::class, 'send'])->middleware('throttle:3,10')->name('enquiry.email-otp.send');
+Route::post('/enquiry/email-otp/verify', [EnquiryEmailOtpController::class, 'verify'])->middleware('throttle:6,10')->name('enquiry.email-otp.verify');
 Route::post('/enquiry', [EnquiryController::class,'store'])->middleware('throttle:10,1')->name('enquiry.store');
 Route::get('/certificate/verify', [CertificateVerificationController::class,'index'])->name('certificates.verify');
 Route::get('/student/login', [StudentPortalController::class,'showLogin'])->name('student.login');
