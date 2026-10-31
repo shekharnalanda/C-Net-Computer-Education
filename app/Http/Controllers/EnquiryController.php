@@ -3,54 +3,54 @@
 namespace App\Http\Controllers;
 
 use App\Models\Enquiry;
-use App\Services\CentralSyncService;
 use App\Support\SiteSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 class EnquiryController extends Controller
 {
-    public function store(Request $request, CentralSyncService $centralSync)
+    public function store(Request $request)
     {
         $data = $request->validate([
             'name' => ['required','string','max:80'],
             'phone' => ['required','string','max:20','regex:/^[0-9+ -]{10,15}$/'],
-            'email' => ['nullable','email','max:120'],
+            'email' => ['required', 'email','max:120'],
             'city' => ['nullable','string','max:80'],
             'course' => ['required','string','max:40'],
             'message' => ['nullable','string','max:1000'],
             'website' => ['nullable','max:0'],
         ]);
 
-        $enquiry = Enquiry::create([
+        
+        $verified = $request->session()->get('enquiry_email_verified');
+        $email = strtolower(trim((string) ($data['email'] ?? '')));
+        if (!$verified || !hash_equals((string) ($verified['email'] ?? ''), $email) || now()->timestamp > (int) ($verified['expires_at'] ?? 0)) {
+            return back()->withInput()->withErrors(['email' => 'पहले इस email पर भेजा गया OTP verify करें।']);
+        }
+        $request->session()->forget('enquiry_email_verified');
+
+$enquiry = Enquiry::create([
             'name'=>$data['name'],'phone'=>$data['phone'],'email'=>$data['email'] ?? null,
             'city'=>$data['city'] ?? null,'course_code'=>$data['course'],
             'message'=>$data['message'] ?? null,'ip_address'=>$request->ip(),
         ]);
 
-        $centralSync->enquiry([
-            'business_code' => config('services.mci_central.business_code'),
-            'source_reference_id' => 'cnet-computer-enquiry-'.$enquiry->id,
-            'source_site' => config('app.url', 'https://cnetcomputer.mciedu.com'),
-            'name' => $enquiry->name,
-            'phone' => $enquiry->phone,
-            'email' => $enquiry->email,
-            'subject' => 'Course Enquiry: '.$enquiry->course_code,
-            'message' => $enquiry->message ?: 'Course information requested.',
-            'category' => 'general',
-            'course_service' => $enquiry->course_code,
-            'priority' => 'normal',
-            'submitted_at' => $enquiry->created_at?->toIso8601String(),
-        ]);
-
         try {
-            $recipient = SiteSettings::get('email', config('mail.enquiry_to'));
+            $recipient = config('enquiry.recipient');
             Mail::raw("Name: {$enquiry->name}\nPhone: {$enquiry->phone}\nEmail: {$enquiry->email}\nCity: {$enquiry->city}\nCourse: {$enquiry->course_code}\nMessage: {$enquiry->message}", function ($mail) use ($enquiry, $recipient) {
                 $mail->to($recipient)->subject("New C-Net Enquiry: {$enquiry->course_code}");
                 if ($enquiry->email) $mail->replyTo($enquiry->email, $enquiry->name);
             });
         } catch (\Throwable $e) {
             report($e);
+        }
+
+        try {
+            Mail::raw('Thank you for contacting C-Net Computer Education. We have received your enquiry and our team will contact you soon.', function ($mail) use ($enquiry) {
+                $mail->to($enquiry->email)->subject('C-Net Computer Education - Enquiry Received');
+            });
+        } catch (\Throwable $exception) {
+            report($exception);
         }
 
         return response()->json(['success'=>true,'message'=>'धन्यवाद! आपकी enquiry सुरक्षित हो गई है। हमारी टीम जल्द संपर्क करेगी।']);
