@@ -102,4 +102,9 @@ $cnetCourses = $courses->map(function ($course) {
   });
 })();
 </script>
+
+<!-- Homepage tile likes and views; comments are intentionally not enabled. -->
+<link rel="stylesheet" href="/tile-engagement.css?v=20261106-1">
+<script src="/tile-engagement.js?v=20261106-1" data-endpoint="/tile-engagement.php" data-tiles=".course,.notice-public-card,.gallery-public-item,.opportunity-card" defer></script>
 </body></html>
+
